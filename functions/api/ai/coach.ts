@@ -4,7 +4,13 @@ export interface Env {
   LLM_MODEL: string
   /** comma-separated tokens */
   PRO_TOKENS: string
+  /** Cloudflare KV for rate limiting */
+  RATE_LIMIT_KV?: KVNamespace
 }
+
+// Tone 화이트리스트
+const ALLOWED_TONES = ['냉정', '따뜻', '유머', '직설'] as const
+type AllowedTone = typeof ALLOWED_TONES[number]
 
 type CoachScript = { title: string; text: string }
 
@@ -46,6 +52,62 @@ function isAllowed(token: string, env: Env) {
   return allow.includes(token)
 }
 
+/**
+ * 토큰 만료 여부 확인
+ * 토큰 형식: {prefix}_{timestamp}_{uuid}_{expiry}
+ */
+function isTokenExpired(token: string): boolean {
+  const parts = token.split('_')
+  if (parts.length < 4) return false // 구형 토큰은 만료 체크 생략 (하위 호환)
+  const expiry = parseInt(parts[3], 36)
+  if (isNaN(expiry)) return false
+  return Date.now() > expiry
+}
+
+/**
+ * Tone 입력 검증 (Prompt Injection 방어)
+ */
+function validateTone(raw: unknown): AllowedTone {
+  if (typeof raw === 'string' && ALLOWED_TONES.includes(raw as AllowedTone)) {
+    return raw as AllowedTone
+  }
+  return '냉정' // 기본값
+}
+
+/**
+ * Rate Limiting (토큰+IP 기반, 1분당 5회)
+ */
+async function checkRateLimit(
+  ip: string,
+  token: string,
+  kv?: KVNamespace
+): Promise<{ allowed: boolean; remaining: number }> {
+  if (!kv) return { allowed: true, remaining: 5 } // KV 미설정시 통과 (개발환경)
+
+  const bucket = Math.floor(Date.now() / 60000) // 1분 버킷
+  const tokenPrefix = token.slice(0, 8) || 'anon'
+  const key = `rate:${ip}:${tokenPrefix}:${bucket}`
+
+  const count = Number(await kv.get(key)) || 0
+  const limit = 5
+
+  if (count >= limit) {
+    return { allowed: false, remaining: 0 }
+  }
+
+  await kv.put(key, String(count + 1), { expirationTtl: 120 })
+  return { allowed: true, remaining: limit - count - 1 }
+}
+
+/**
+ * 클라이언트 IP 추출
+ */
+function getClientIP(req: Request): string {
+  return req.headers.get('CF-Connecting-IP') ||
+    req.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() ||
+    'unknown'
+}
+
 function buildSystemPrompt() {
   return [
     '너는 “인간관계 손익계산서(Relationship ROI)” 앱의 유료 코치다.',
@@ -63,7 +125,7 @@ function buildSystemPrompt() {
 }
 
 function buildUserPrompt(payload: any) {
-  const tone = payload?.tone || '냉정'
+  const tone = validateTone(payload?.tone)
   const situation = String(payload?.situation || '').slice(0, 2000)
   const r = payload?.report || {}
 
@@ -131,7 +193,29 @@ function normalizeOut(obj: any): CoachResponse {
 
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const token = getBearer(ctx.request)
-  if (!isAllowed(token, ctx.env)) return unauthorized('PRO token required')
+  const clientIP = getClientIP(ctx.request)
+
+  // 1. 토큰 유효성 검증
+  if (!isAllowed(token, ctx.env)) {
+    return unauthorized('PRO token required')
+  }
+
+  // 2. 토큰 만료 검증
+  if (isTokenExpired(token)) {
+    return unauthorized('토큰이 만료되었습니다. PRO를 갱신해주세요.')
+  }
+
+  // 3. Rate Limiting
+  const rateResult = await checkRateLimit(clientIP, token, ctx.env.RATE_LIMIT_KV)
+  if (!rateResult.allowed) {
+    return json(
+      { error: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': '60' },
+      }
+    )
+  }
 
   let payload: any
   try {
@@ -165,8 +249,16 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     while (out.scripts.length < 3) out.scripts.push({ title: '문장', text: '' })
     while (out.next.length < 4) out.next.push('')
 
-    return json(out)
+    // Rate limit 잔여 횟수를 헤더에 포함
+    return json(out, {
+      headers: { 'X-RateLimit-Remaining': String(rateResult.remaining) },
+    })
   } catch (e: any) {
-    return json({ error: String(e?.message || e) }, { status: 500 })
+    // 민감정보 미노출: 일반화된 에러 메시지 반환
+    console.error('[coach] LLM error:', e) // 서버 로그에만 기록
+    return json(
+      { error: '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },
+      { status: 500 }
+    )
   }
 }

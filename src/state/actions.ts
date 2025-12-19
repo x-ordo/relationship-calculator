@@ -79,7 +79,7 @@ export async function runCoach(dispatch: Dispatch, getState: GetState) {
     }
 
     try {
-      const payload = toCoachPayload(report, maskPii(situation), tone)
+      const payload = toCoachPayload({ report, situation: maskPii(situation), tone })
       const result = await callPaidCoach(payload, token)
       dispatch({ type: 'COACH_RUN_OK', data: result })
       return

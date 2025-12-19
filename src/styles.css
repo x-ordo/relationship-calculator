@@ -100,7 +100,8 @@ a { color: inherit; }
   grid-template-columns: 1fr;
   gap: 12px;
 }
-@media (min-width: 980px) {
+/* 태블릿에서도 2열 그리드 지원 */
+@media (min-width: 640px) {
   .grid.cols-2 { grid-template-columns: 1fr 1fr; }
 }
 
@@ -120,7 +121,11 @@ a { color: inherit; }
   outline: none;
 }
 
-.input.small { width: 140px; }
+.input.small {
+  width: 120px;
+  min-width: 80px;
+  flex-shrink: 1;
+}
 
 .btn {
   border: 1px solid var(--border);
@@ -268,7 +273,9 @@ a { color: inherit; }
 }
 
 .qInput {
-  width: 92px;
+  width: 80px;
+  min-width: 60px;
+  flex-shrink: 1;
 }
 
 .textarea {
@@ -415,7 +422,9 @@ a { color: inherit; }
 .fab {
   position: fixed;
   right: 16px;
+  right: max(16px, env(safe-area-inset-right, 0px));
   bottom: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   z-index: 45;
   border: 1px solid rgba(255,255,255,0.16);
   background: rgba(124,58,237,0.92);
@@ -472,4 +481,57 @@ a { color: inherit; }
 .rr-pop {
   animation: rr-pop 220ms ease-out;
   will-change: transform, filter;
+}
+
+/* 모바일 반응형 개선 */
+@media (max-width: 480px) {
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .brand {
+    justify-content: center;
+  }
+
+  .tabs {
+    justify-content: center;
+  }
+
+  .tab {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .h1 {
+    font-size: 22px;
+  }
+}
+
+/* QuickLogBar 모바일 레이아웃 */
+@media (max-width: 520px) {
+  .quickbar .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .qGroup {
+    width: 100%;
+  }
+
+  .qButtons {
+    flex-wrap: wrap;
+  }
+
+  .qBtn {
+    flex: 1 1 auto;
+    min-width: 48px;
+    text-align: center;
+  }
+
+  .qInput {
+    width: 100%;
+    max-width: 120px;
+  }
 }

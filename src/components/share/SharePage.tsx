@@ -215,8 +215,8 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
               </select>
             </label>
           
-            <button class="btn" onClick={randomizeCopy}>랜덤 카피</button>
-            <button class="btn" onClick={randomizeLayout}>랜덤 레이아웃</button>
+            <button class="btn" onClick={() => randomizeCopy()}>랜덤 카피</button>
+            <button class="btn" onClick={() => randomizeLayout()}>랜덤 레이아웃</button>
             <button class="btn" onClick={randomizeAll}>랜덤 전체</button>
 </div>
 

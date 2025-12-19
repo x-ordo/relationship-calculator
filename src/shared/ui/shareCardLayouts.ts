@@ -1,0 +1,268 @@
+export type LayoutId =
+  | 'L01_CLEAN'
+  | 'L02_BRUTAL'
+  | 'L03_LEDGER'
+  | 'L04_STAMP'
+  | 'L05_TERMINAL'
+  | 'L06_RECEIPT'
+  | 'L07_POSTER'
+  | 'L08_MINIMAL'
+  | 'L09_CARDSTACK'
+  | 'L10_GRID'
+  | 'L11_PULSE'
+  | 'L12_MOTION'
+
+export type LayoutSpec = {
+  id: LayoutId
+  name: string
+  bg: string
+  fg: string
+  accent: string
+  sub: string
+  border: string
+  radius: number
+  hSize: number
+  subSize: number
+  metaSize: number
+  showBigNumber: boolean
+  showCauseChip: boolean
+  showStamp: boolean
+  showGrid: boolean
+  showFooterBrand: boolean
+  brutal: boolean
+}
+
+export const SHARE_CARD_LAYOUTS: LayoutSpec[] = [
+  {
+    id: 'L01_CLEAN',
+    name: 'Clean Report',
+    bg: '#0B0F19',
+    fg: '#E8ECF6',
+    accent: '#7C3AED',
+    sub: '#B8C0D8',
+    border: 'rgba(255,255,255,0.12)',
+    radius: 28,
+    hSize: 44,
+    subSize: 18,
+    metaSize: 14,
+    showBigNumber: true,
+    showCauseChip: true,
+    showStamp: false,
+    showGrid: false,
+    showFooterBrand: true,
+    brutal: false,
+  },
+  {
+    id: 'L02_BRUTAL',
+    name: 'Brutal Verdict',
+    bg: '#070707',
+    fg: '#F8F8F8',
+    accent: '#F97316',
+    sub: '#A3A3A3',
+    border: 'rgba(255,255,255,0.14)',
+    radius: 18,
+    hSize: 48,
+    subSize: 18,
+    metaSize: 14,
+    showBigNumber: true,
+    showCauseChip: true,
+    showStamp: true,
+    showGrid: false,
+    showFooterBrand: true,
+    brutal: true,
+  },
+  {
+    id: 'L03_LEDGER',
+    name: 'Ledger Sheet',
+    bg: '#0A0A0A',
+    fg: '#EAEAEA',
+    accent: '#22C55E',
+    sub: '#9CA3AF',
+    border: 'rgba(255,255,255,0.10)',
+    radius: 24,
+    hSize: 38,
+    subSize: 16,
+    metaSize: 13,
+    showBigNumber: true,
+    showCauseChip: false,
+    showStamp: false,
+    showGrid: true,
+    showFooterBrand: true,
+    brutal: false,
+  },
+  {
+    id: 'L04_STAMP',
+    name: 'Stamped Notice',
+    bg: '#0B1220',
+    fg: '#F1F5FF',
+    accent: '#60A5FA',
+    sub: '#B6C4E6',
+    border: 'rgba(255,255,255,0.12)',
+    radius: 30,
+    hSize: 42,
+    subSize: 18,
+    metaSize: 13,
+    showBigNumber: false,
+    showCauseChip: true,
+    showStamp: true,
+    showGrid: false,
+    showFooterBrand: true,
+    brutal: false,
+  },
+  {
+    id: 'L05_TERMINAL',
+    name: 'Terminal Log',
+    bg: '#06110B',
+    fg: '#E7FFE8',
+    accent: '#34D399',
+    sub: '#9DE8B2',
+    border: 'rgba(52,211,153,0.22)',
+    radius: 20,
+    hSize: 36,
+    subSize: 16,
+    metaSize: 13,
+    showBigNumber: true,
+    showCauseChip: false,
+    showStamp: false,
+    showGrid: true,
+    showFooterBrand: true,
+    brutal: true,
+  },
+  {
+    id: 'L06_RECEIPT',
+    name: 'Receipt',
+    bg: '#0A0A0A',
+    fg: '#F5F5F5',
+    accent: '#FACC15',
+    sub: '#D4D4D4',
+    border: 'rgba(250,204,21,0.18)',
+    radius: 16,
+    hSize: 40,
+    subSize: 16,
+    metaSize: 12,
+    showBigNumber: true,
+    showCauseChip: true,
+    showStamp: false,
+    showGrid: true,
+    showFooterBrand: true,
+    brutal: false,
+  },
+  {
+    id: 'L07_POSTER',
+    name: 'Poster',
+    bg: '#0B1020',
+    fg: '#FFFFFF',
+    accent: '#EC4899',
+    sub: '#CBD5E1',
+    border: 'rgba(236,72,153,0.20)',
+    radius: 36,
+    hSize: 50,
+    subSize: 18,
+    metaSize: 14,
+    showBigNumber: false,
+    showCauseChip: true,
+    showStamp: false,
+    showGrid: false,
+    showFooterBrand: true,
+    brutal: false,
+  },
+  {
+    id: 'L08_MINIMAL',
+    name: 'Minimal Calm',
+    bg: '#0A0F1A',
+    fg: '#EEF2FF',
+    accent: '#A78BFA',
+    sub: '#A5B4FC',
+    border: 'rgba(255,255,255,0.08)',
+    radius: 40,
+    hSize: 40,
+    subSize: 16,
+    metaSize: 13,
+    showBigNumber: false,
+    showCauseChip: false,
+    showStamp: false,
+    showGrid: false,
+    showFooterBrand: true,
+    brutal: false,
+  },
+  {
+    id: 'L09_CARDSTACK',
+    name: 'Card Stack',
+    bg: '#070A12',
+    fg: '#E5E7EB',
+    accent: '#38BDF8',
+    sub: '#9CA3AF',
+    border: 'rgba(56,189,248,0.18)',
+    radius: 28,
+    hSize: 40,
+    subSize: 16,
+    metaSize: 13,
+    showBigNumber: true,
+    showCauseChip: true,
+    showStamp: false,
+    showGrid: false,
+    showFooterBrand: true,
+    brutal: false,
+  },
+  {
+    id: 'L10_GRID',
+    name: 'Grid Report',
+    bg: '#0B0B0B',
+    fg: '#FAFAFA',
+    accent: '#FB7185',
+    sub: '#A3A3A3',
+    border: 'rgba(255,255,255,0.12)',
+    radius: 22,
+    hSize: 38,
+    subSize: 16,
+    metaSize: 12,
+    showBigNumber: true,
+    showCauseChip: true,
+    showStamp: false,
+    showGrid: true,
+    showFooterBrand: true,
+    brutal: true,
+  },
+  {
+    id: 'L11_PULSE',
+    name: 'Pulse',
+    bg: '#0A0D16',
+    fg: '#F3F4F6',
+    accent: '#22C55E',
+    sub: '#9CA3AF',
+    border: 'rgba(34,197,94,0.18)',
+    radius: 30,
+    hSize: 44,
+    subSize: 18,
+    metaSize: 13,
+    showBigNumber: true,
+    showCauseChip: false,
+    showStamp: false,
+    showGrid: false,
+    showFooterBrand: true,
+    brutal: false,
+  },
+  {
+    id: 'L12_MOTION',
+    name: 'Motion Stripe',
+    bg: '#080A10',
+    fg: '#F8FAFC',
+    accent: '#7DD3FC',
+    sub: '#CBD5E1',
+    border: 'rgba(125,211,252,0.14)',
+    radius: 34,
+    hSize: 42,
+    subSize: 17,
+    metaSize: 13,
+    showBigNumber: false,
+    showCauseChip: true,
+    showStamp: false,
+    showGrid: true,
+    showFooterBrand: true,
+    brutal: false,
+  },
+]
+
+export function getLayout(id: LayoutId) {
+  return SHARE_CARD_LAYOUTS.find(x => x.id === id) || SHARE_CARD_LAYOUTS[0]
+}

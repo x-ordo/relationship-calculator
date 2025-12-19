@@ -1,0 +1,25 @@
+{
+  "name": "relationship-roi-preact",
+  "private": true,
+  "version": "0.5.8",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint:quick": "node -e \"console.log('lint skipped')\""
+  },
+  "dependencies": {
+    "preact": "^10.25.4",
+    "html-to-image": "^1.11.13",
+    "html2canvas": "^1.4.1"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.1",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "@cloudflare/workers-types": "^4.20241230.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

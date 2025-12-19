@@ -40,6 +40,9 @@ Relationship ROI를 **MVP(v0.5) → 수익화 가능한 v1**으로 올린다.
 - 의존성 최소화
 - UI는 단순. 컴포넌트는 작게.
 - 계산 로직은 `src/shared/domain`에 유지
-- UI는 단순. 컴포넌트는 작게.
-- 계산 로직은 `src/shared/domain`에 유지
 - 서버 코드는 `functions/`에만 둔다(프론트와 분리)
+
+## Git 커밋 규칙
+- "Generated with Claude Code" 푸터 사용 금지
+- "Co-Authored-By" 사용 금지
+- 커밋 메시지는 한국어로 간결하게 작성

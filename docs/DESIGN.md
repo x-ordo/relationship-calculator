@@ -25,6 +25,106 @@
 - 카드(Panel) 중심, 넓은 여백
 - 결과 페이지는 "판결문" 느낌: 짧고 단호한 문장 + 숫자
 
+---
+
+## Fluent 2 디자인 시스템
+
+Microsoft Fluent 2 디자인 시스템 기반. 다크 테마 전용.
+
+### Color Tokens
+
+#### Neutral (배경/전경)
+| 토큰 | 값 | 용도 |
+|------|-----|------|
+| `--colorNeutralBackground1` | #292929 | Elevated surface |
+| `--colorNeutralBackground2` | #1f1f1f | Card, Panel |
+| `--colorNeutralBackground3` | #141414 | Page background |
+| `--colorNeutralBackground4` | #0a0a0a | Deepest layer |
+| `--colorNeutralForeground1` | #ffffff | Primary text |
+| `--colorNeutralForeground2` | #d6d6d6 | Secondary text |
+| `--colorNeutralForeground3` | #adadad | Muted text |
+| `--colorNeutralStroke1` | #3d3d3d | Border |
+
+#### Brand (액센트)
+| 토큰 | 값 | 용도 |
+|------|-----|------|
+| `--colorBrandBackground` | #2899f5 | Primary action |
+| `--colorBrandBackgroundHover` | #3aa0f3 | Hover state |
+| `--colorBrandForeground1` | #82c7ff | Active text |
+
+#### Status (상태)
+| 토큰 | 값 | 용도 |
+|------|-----|------|
+| `--colorStatusDangerForeground` | #dc626d | Error, 손실 |
+| `--colorStatusSuccessForeground` | #54b054 | Success, 흑자 |
+| `--colorStatusWarningForeground` | #fde68a | Warning |
+
+### Border Radius
+
+| 토큰 | 값 | 용도 |
+|------|-----|------|
+| `--borderRadiusSmall` | 2px | Subtle rounding |
+| `--borderRadiusMedium` | 4px | Input, Button |
+| `--borderRadiusLarge` | 6px | Card, Panel |
+| `--borderRadiusXLarge` | 8px | Modal, Sheet |
+| `--borderRadiusCircular` | 9999px | Pill, Badge |
+
+### Spacing (4px base)
+
+| 토큰 | 값 |
+|------|-----|
+| `--spacingHorizontalXXS` | 2px |
+| `--spacingHorizontalXS` | 4px |
+| `--spacingHorizontalS` | 8px |
+| `--spacingHorizontalM` | 12px |
+| `--spacingHorizontalL` | 16px |
+| `--spacingHorizontalXL` | 20px |
+| `--spacingHorizontalXXL` | 24px |
+
+### Typography
+
+| 토큰 | 값 |
+|------|-----|
+| `--fontFamilyBase` | 'Segoe UI', -apple-system, system-ui |
+| `--fontSizeBase200` | 12px |
+| `--fontSizeBase300` | 14px (기본) |
+| `--fontSizeBase400` | 16px |
+| `--fontSizeBase500` | 20px |
+| `--fontSizeBase600` | 24px |
+| `--fontWeightRegular` | 400 |
+| `--fontWeightSemibold` | 600 |
+| `--fontWeightBold` | 700 |
+
+### Shadow
+
+| 토큰 | 값 | 용도 |
+|------|-----|------|
+| `--shadow4` | 0 2px 4px rgba(0,0,0,0.14) | Card |
+| `--shadow8` | 0 4px 8px rgba(0,0,0,0.14) | Elevated |
+| `--shadow16` | 0 8px 16px rgba(0,0,0,0.14) | FAB |
+| `--shadow28` | 0 14px 28px rgba(0,0,0,0.24) | Modal |
+
+### 레거시 호환 변수
+
+기존 코드 호환을 위해 별칭 유지:
+```css
+--bg: var(--colorNeutralBackground3);
+--panel: var(--colorNeutralBackground2);
+--border: var(--colorNeutralStroke1);
+--text: var(--colorNeutralForeground1);
+--muted: var(--colorNeutralForeground3);
+--accent: var(--colorBrandBackground);
+--danger: var(--colorStatusDangerForeground);
+--ok: var(--colorStatusSuccessForeground);
+```
+
+### 참고 자료
+- [Fluent 2 Design System](https://fluent2.microsoft.design/)
+- [Fluent UI React Tokens](https://react.fluentui.dev/)
+- [@fluentui/tokens](https://github.com/microsoft/fluentui/tree/master/packages/tokens)
+
+---
+
 ## 한국어 마이크로카피 가이드(독하게)
 
 - 입력 유도

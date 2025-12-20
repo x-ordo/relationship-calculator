@@ -1,5 +1,5 @@
 import type { AppState as DomainState, Entry, Person, Plan, AppSettings } from '../shared/storage/state'
-import type { CoachResult, CoachTone } from '../shared/rules/fakeCoach'
+import type { CoachResult, CoachTone, CoachContext } from '../shared/rules/fakeCoach'
 
 export type AppEvent =
   | { type: 'APP_INIT' }
@@ -20,7 +20,7 @@ export type AppEvent =
   | { type: 'ENTRY_DELETE'; entryId: string }
 
   // coach ui
-  | { type: 'COACH_DRAFT'; patch: Partial<{ tone: CoachTone; situation: string }> }
+  | { type: 'COACH_DRAFT'; patch: Partial<{ tone: CoachTone; situation: string; context: CoachContext }> }
   | { type: 'COACH_RUN_START' }
   | { type: 'COACH_RUN_OK'; data: CoachResult }
   | { type: 'COACH_RUN_FAIL'; error: string }

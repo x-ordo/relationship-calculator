@@ -1,9 +1,11 @@
-import type { CoachTone, CoachResult } from '../rules/fakeCoach'
+import type { CoachTone, CoachResult, CoachContext } from '../rules/fakeCoach'
 import type { Report } from '../domain/report'
 
 export type CoachPayload = {
   tone: CoachTone
   situation: string
+  /** B2B/B2C 분류 */
+  context: CoachContext
   report: {
     windowLabel: string
     totals: {
@@ -24,13 +26,19 @@ export type CoachApiError = {
   message: string
 }
 
-export function toCoachPayload(args: { report: Report; situation: string; tone: CoachTone }): CoachPayload {
-  const { report, situation, tone } = args
+export function toCoachPayload(args: {
+  report: Report
+  situation: string
+  tone: CoachTone
+  context?: CoachContext
+}): CoachPayload {
+  const { report, situation, tone, context = 'personal' } = args
   // 개인정보/식별정보를 서버에 보내지 않는다.
   // notes, raw names list, raw entries는 제외.
   return {
     tone,
     situation,
+    context,
     report: {
       windowLabel: report.windowLabel,
       totals: {
@@ -70,16 +78,18 @@ export async function callPaidCoach(payload: CoachPayload, token: string): Promi
   }
 
   const data = await res.json()
-  // 최소한의 런타임 검증
-  if (!data?.title || !data?.diagnosis || !Array.isArray(data?.scripts) || !Array.isArray(data?.next)) {
+  // 최소한의 런타임 검증 (새로운 판결문 형식)
+  if (!data?.title || !data?.verdict || !Array.isArray(data?.sentences) || !Array.isArray(data?.actions)) {
     throw { status: 500, message: 'Invalid response shape' } satisfies CoachApiError
   }
 
   return {
     title: String(data.title),
-    diagnosis: String(data.diagnosis),
-    scripts: data.scripts.map((s: any) => ({ title: String(s.title), text: String(s.text) })),
-    next: data.next.map((n: any) => String(n)),
+    verdict: String(data.verdict),
+    reasoning: String(data.reasoning || ''),
+    sentences: data.sentences.map((s: any) => ({ label: String(s.label), text: String(s.text) })),
+    actions: data.actions.map((n: any) => String(n)),
+    grade: data.grade || 'WARNING',
     disclaimer: String(data.disclaimer || ''),
   }
 }

@@ -62,8 +62,7 @@ export async function unlockPro(dispatch: Dispatch, code: string) {
 /** Coach run: free_rules -> paid_api (if enabled) with safe fallback */
 export async function runCoach(dispatch: Dispatch, getState: GetState) {
   const s0 = getState()
-  const tone = s0.coachUi.draft.tone
-  const situation = s0.coachUi.draft.situation
+  const { tone, situation, context } = s0.coachUi.draft
 
   dispatch({ type: 'COACH_RUN_START' })
 
@@ -79,13 +78,13 @@ export async function runCoach(dispatch: Dispatch, getState: GetState) {
     }
 
     try {
-      const payload = toCoachPayload({ report, situation: maskPii(situation), tone })
+      const payload = toCoachPayload({ report, situation: maskPii(situation), tone, context })
       const result = await callPaidCoach(payload, token)
       dispatch({ type: 'COACH_RUN_OK', data: result })
       return
     } catch (e) {
       // fallback to free
-      const fb = fakeCoach({ report, situation, tone })
+      const fb = fakeCoach({ report, situation, tone, context })
       fb.disclaimer = `${fb.disclaimer}\n(유료 호출 실패 → 무료 규칙 코치로 폴백)`
       dispatch({ type: 'COACH_RUN_OK', data: fb })
       return
@@ -94,7 +93,7 @@ export async function runCoach(dispatch: Dispatch, getState: GetState) {
 
   // FREE path
   try {
-    const result = fakeCoach({ report, situation, tone })
+    const result = fakeCoach({ report, situation, tone, context })
     dispatch({ type: 'COACH_RUN_OK', data: result })
   } catch (e) {
     dispatch({ type: 'COACH_RUN_FAIL', error: toErrorMessage(e) })

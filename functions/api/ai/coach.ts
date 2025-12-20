@@ -9,16 +9,22 @@ export interface Env {
 }
 
 // Tone 화이트리스트
-const ALLOWED_TONES = ['냉정', '따뜻', '유머', '직설'] as const
+const ALLOWED_TONES = ['냉정', '정중', '유머'] as const
 type AllowedTone = typeof ALLOWED_TONES[number]
 
-type CoachScript = { title: string; text: string }
+// Context 화이트리스트 (B2B/B2C)
+const ALLOWED_CONTEXTS = ['personal', 'client'] as const
+type AllowedContext = typeof ALLOWED_CONTEXTS[number]
+
+type CoachSentence = { label: string; text: string }
 
 type CoachResponse = {
   title: string
-  diagnosis: string
-  scripts: CoachScript[]
-  next: string[]
+  verdict: string
+  reasoning: string
+  sentences: CoachSentence[]
+  actions: string[]
+  grade: 'GUILTY' | 'WARNING' | 'PROBATION' | 'INNOCENT'
   disclaimer: string
 }
 
@@ -75,6 +81,16 @@ function validateTone(raw: unknown): AllowedTone {
 }
 
 /**
+ * Context 입력 검증 (B2B/B2C)
+ */
+function validateContext(raw: unknown): AllowedContext {
+  if (typeof raw === 'string' && ALLOWED_CONTEXTS.includes(raw as AllowedContext)) {
+    return raw as AllowedContext
+  }
+  return 'personal' // 기본값
+}
+
+/**
  * Rate Limiting (토큰+IP 기반, 1분당 5회)
  */
 async function checkRateLimit(
@@ -108,24 +124,56 @@ function getClientIP(req: Request): string {
     'unknown'
 }
 
-function buildSystemPrompt() {
+function buildSystemPrompt(context: AllowedContext) {
+  const isClient = context === 'client'
+
+  const roleDesc = isClient
+    ? '너는 "관계 감사 리포트(Relationship Audit)" 앱의 B2B 전문 AI 판사다. 프리랜서/1인 기업의 클라이언트 관계를 냉정하게 심판한다.'
+    : '너는 "관계 감사 리포트(Relationship Audit)" 앱의 AI 판사다. 인간관계를 법원 판결문 형식으로 심판한다.'
+
+  const contextRules = isClient
+    ? [
+        '- B2B 관점: 수익성, ROI, 단가, 거래조건 중심으로 판단.',
+        '- 클라이언트를 "피청구인" 또는 "해당 거래처"로 지칭.',
+        '- sentences는 단가 인상, 업무 범위 명시, 거래 종료 등 비즈니스 문구.',
+        '- actions는 견적 조정, 결제 조건 변경 등 실무적 조치.',
+      ]
+    : [
+        '- B2C 관점: 감정 손실, 시간 낭비, 상호성 중심으로 판단.',
+        '- 상대방을 "피고" 또는 "해당 인물"로 지칭.',
+        '- sentences는 손절 선언, 경계 설정, 거래 종료 등 관계 정리 문구.',
+        '- actions는 연락 빈도 조절, 거절 연습 등 일상적 조치.',
+      ]
+
   return [
-    '너는 “인간관계 손익계산서(Relationship ROI)” 앱의 유료 코치다.',
-    '목표: 사용자가 감정 과열 상태에서도 “결정”을 내릴 수 있게 짧고 단호하게 정리한다.',
+    roleDesc,
+    '',
+    '목표: 사용자가 감정 과열 상태에서도 "결정"을 내릴 수 있게 법원 판결문처럼 냉정하게 정리한다.',
+    '',
     '규칙:',
     '- 의료/치료/진단처럼 말하지 마라. (상담/치료 권유는 가능하지만, 진단명/치료지시는 금지)',
     '- 폭력/불법/자해 관련 조언은 금지. (안전하고 합법적인 대안만)',
-    '- 1) 요약판결 1문장, 2) 진단(상황 구조) 2~3문장, 3) 복붙 문장 3개, 4) 다음 행동 4개.',
-    '- “독하게” 말하되, 모욕/혐오 표현은 금지.',
+    ...contextRules,
+    '- grade는 손실액/ROI에 따라: GUILTY(즉시 손절), WARNING(비중 축소), PROBATION(관찰), INNOCENT(유지)',
+    '- "독하게" 말하되, 모욕/혐오 표현은 금지.',
     '- 출력은 반드시 JSON 한 덩어리로만. 코드펜스 금지.',
     '',
     'JSON 스키마:',
-    '{"title":string,"diagnosis":string,"scripts":[{"title":string,"text":string}*3],"next":[string*4],"disclaimer":string}',
+    '{',
+    '  "title": string (예: "판결문 제123456호"),',
+    '  "verdict": string (판결 요약 1문장, 피고/클라이언트에게 유죄/경고 등 선고),',
+    '  "reasoning": string (판결 이유 2~3문장),',
+    '  "sentences": [{"label":string,"text":string}*3] (선고 문구, 복붙용),',
+    '  "actions": [string*4] (이행 조항),',
+    '  "grade": "GUILTY"|"WARNING"|"PROBATION"|"INNOCENT",',
+    '  "disclaimer": string (법적 효력 없음 고지)',
+    '}',
   ].join('\n')
 }
 
 function buildUserPrompt(payload: any) {
   const tone = validateTone(payload?.tone)
+  const context = validateContext(payload?.context)
   const situation = String(payload?.situation || '').slice(0, 2000)
   const r = payload?.report || {}
 
@@ -137,8 +185,11 @@ function buildUserPrompt(payload: any) {
     topPersonLabel: r?.topPersonLabel,
   }
 
+  const contextLabel = context === 'client' ? 'B2B (클라이언트/업무)' : 'B2C (개인 관계)'
+
   return [
     `톤: ${tone}`,
+    `컨텍스트: ${contextLabel}`,
     '',
     '상황(사용자 입력):',
     situation,
@@ -179,15 +230,21 @@ async function callOpenAICompatible(env: Env, messages: any[]) {
 }
 
 function normalizeOut(obj: any): CoachResponse {
-  const scripts = Array.isArray(obj?.scripts) ? obj.scripts : []
-  const next = Array.isArray(obj?.next) ? obj.next : []
+  const sentences = Array.isArray(obj?.sentences) ? obj.sentences : []
+  const actions = Array.isArray(obj?.actions) ? obj.actions : []
+
+  // grade 유효성 검증
+  const validGrades = ['GUILTY', 'WARNING', 'PROBATION', 'INNOCENT'] as const
+  const grade = validGrades.includes(obj?.grade) ? obj.grade : 'WARNING'
 
   return {
-    title: String(obj?.title || '코치 결과'),
-    diagnosis: String(obj?.diagnosis || ''),
-    scripts: scripts.slice(0, 3).map((s: any) => ({ title: String(s?.title || ''), text: String(s?.text || '') })),
-    next: next.slice(0, 4).map((n: any) => String(n)),
-    disclaimer: String(obj?.disclaimer || '본 결과는 자기관리 보조이며 의료/치료 목적이 아닙니다.'),
+    title: String(obj?.title || '판결문'),
+    verdict: String(obj?.verdict || ''),
+    reasoning: String(obj?.reasoning || ''),
+    sentences: sentences.slice(0, 3).map((s: any) => ({ label: String(s?.label || ''), text: String(s?.text || '') })),
+    actions: actions.slice(0, 4).map((n: any) => String(n)),
+    grade,
+    disclaimer: String(obj?.disclaimer || '본 판결은 자기관리 보조 목적이며, 법적 효력이 없습니다.'),
   }
 }
 
@@ -228,7 +285,8 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   if (!situation) return badRequest('situation required')
 
   try {
-    const system = buildSystemPrompt()
+    const context = validateContext(payload?.context)
+    const system = buildSystemPrompt(context)
     const user = buildUserPrompt(payload)
 
     const content = await callOpenAICompatible(ctx.env, [
@@ -241,13 +299,13 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       obj = JSON.parse(content)
     } catch {
       // 모델이 JSON 말고 다른 걸 뱉으면 강제 래핑
-      obj = { title: '코치 결과', diagnosis: content, scripts: [], next: [], disclaimer: '' }
+      obj = { title: '판결문', verdict: content, reasoning: '', sentences: [], actions: [], grade: 'WARNING', disclaimer: '' }
     }
 
     const out = normalizeOut(obj)
-    // 안전망: scripts 3개/next 4개 부족하면 채움
-    while (out.scripts.length < 3) out.scripts.push({ title: '문장', text: '' })
-    while (out.next.length < 4) out.next.push('')
+    // 안전망: sentences 3개/actions 4개 부족하면 채움
+    while (out.sentences.length < 3) out.sentences.push({ label: '선고', text: '' })
+    while (out.actions.length < 4) out.actions.push('')
 
     // Rate limit 잔여 횟수를 헤더에 포함
     return json(out, {

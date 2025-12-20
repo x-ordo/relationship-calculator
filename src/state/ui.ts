@@ -1,5 +1,5 @@
 import type { AsyncState } from './async'
-import type { CoachResult, CoachTone } from '../shared/rules/fakeCoach'
+import type { CoachResult, CoachTone, CoachContext } from '../shared/rules/fakeCoach'
 
 export type AppLoad =
   | { kind: 'BOOT' }
@@ -27,7 +27,7 @@ export type DashboardUi =
 
 /** Coach UI */
 export type CoachUi = {
-  draft: { tone: CoachTone; situation: string }
+  draft: { tone: CoachTone; situation: string; context: CoachContext }
   run: AsyncState<CoachResult>
   needPro: boolean
 }

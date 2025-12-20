@@ -25,7 +25,7 @@ export function initialState(): AppState {
 
     dashboardUi: { kind: 'EMPTY' },
     coachUi: {
-      draft: { tone: '냉정', situation: '' },
+      draft: { tone: '냉정', situation: '', context: 'personal' },
       run: idle(),
       needPro: false,
     },

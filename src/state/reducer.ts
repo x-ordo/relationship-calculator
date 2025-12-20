@@ -111,6 +111,27 @@ case 'PERSON_ADD': {
     case 'PRO_UNLOCK_FAIL':
       return { ...s, proUi: { ...s.proUi, unlock: err(e.error) } }
 
+    // payment
+    case 'PAYMENT_START':
+      return { ...s, proUi: { ...s.proUi, payment: loading() } }
+
+    case 'PAYMENT_OK':
+      return {
+        ...s,
+        domain: {
+          ...s.domain,
+          plan: 'paid',
+          entitlement: { token: e.token, expiresAt: e.expiresAt },
+        },
+        proUi: { ...s.proUi, payment: success({ token: e.token, expiresAt: e.expiresAt }) },
+      }
+
+    case 'PAYMENT_FAIL':
+      return { ...s, proUi: { ...s.proUi, payment: err(e.error) } }
+
+    case 'PAYMENT_RESET':
+      return { ...s, proUi: { ...s.proUi, payment: { status: 'idle' } } }
+
     default:
       return s
   }

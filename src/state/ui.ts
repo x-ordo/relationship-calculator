@@ -48,4 +48,5 @@ export type ShareUi = {
 export type ProUi = {
   unlockCode: string
   unlock: AsyncState<{ token: string }>
+  payment: AsyncState<{ token: string; expiresAt: string }>
 }

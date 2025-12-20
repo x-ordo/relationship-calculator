@@ -5,6 +5,7 @@ import { buildReport } from '../shared/domain/report'
 import { fakeCoach } from '../shared/rules/fakeCoach'
 import { callPaidCoach, toCoachPayload } from '../shared/api/coachApi'
 import { maskPii } from '../shared/privacy/pii'
+import { requestPayment, handlePaymentCallback, type ProductId } from '../shared/payment/portone'
 
 export type Dispatch = (e: AppEvent) => void
 export type GetState = () => AppState
@@ -97,5 +98,36 @@ export async function runCoach(dispatch: Dispatch, getState: GetState) {
     dispatch({ type: 'COACH_RUN_OK', data: result })
   } catch (e) {
     dispatch({ type: 'COACH_RUN_FAIL', error: toErrorMessage(e) })
+  }
+}
+
+/** PRO 결제: PortOne SDK → 서버 검증 → 토큰 저장 */
+export async function purchasePro(dispatch: Dispatch, productId: ProductId) {
+  dispatch({ type: 'PAYMENT_START' })
+  try {
+    const result = await requestPayment(productId)
+    if (result.success === true) {
+      dispatch({ type: 'PAYMENT_OK', token: result.token, expiresAt: result.expiresAt })
+    } else if (result.success === false) {
+      dispatch({ type: 'PAYMENT_FAIL', error: result.error })
+    }
+  } catch (e) {
+    dispatch({ type: 'PAYMENT_FAIL', error: toErrorMessage(e) })
+  }
+}
+
+/** 모바일 결제 콜백 체크 (앱 초기화 시 호출) */
+export async function checkPaymentCallback(dispatch: Dispatch) {
+  try {
+    const result = await handlePaymentCallback()
+    if (!result) return // 콜백 아님
+
+    if (result.success === true) {
+      dispatch({ type: 'PAYMENT_OK', token: result.token, expiresAt: result.expiresAt })
+    } else if (result.success === false) {
+      dispatch({ type: 'PAYMENT_FAIL', error: result.error })
+    }
+  } catch (e) {
+    console.error('[checkPaymentCallback]', e)
   }
 }

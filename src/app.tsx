@@ -7,7 +7,8 @@ import { ProPage } from './components/pro/ProPage'
 import { OnboardingOverlay, needsOnboarding } from './components/onboarding/OnboardingOverlay'
 import { reducer } from './state/reducer'
 import { initialState, type AppState } from './state/state'
-import { initApp, persistDomain, runCoach, unlockPro } from './state/actions'
+import { initApp, persistDomain, runCoach, unlockPro, purchasePro, checkPaymentCallback } from './state/actions'
+import type { ProductId } from './shared/payment/portone'
 
 export function App() {
   const [state, dispatch] = useReducer(reducer, undefined, initialState)
@@ -18,9 +19,10 @@ export function App() {
   }, [state])
   const getState = () => stateRef.current
 
-  // init: load persisted domain
+  // init: load persisted domain + check payment callback
   useEffect(() => {
     initApp(dispatch)
+    checkPaymentCallback(dispatch)
   }, [])
 
   // persist domain when ready (avoid overwriting storage during BOOT/LOADING)
@@ -34,6 +36,7 @@ export function App() {
     return {
       runCoach: () => runCoach(dispatch, getState),
       unlockPro: (code: string) => unlockPro(dispatch, code),
+      purchasePro: (productId: ProductId) => purchasePro(dispatch, productId),
     }
   }, [])
 

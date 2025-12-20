@@ -31,3 +31,9 @@ export type AppEvent =
   | { type: 'PRO_UNLOCK_START' }
   | { type: 'PRO_UNLOCK_OK'; token: string }
   | { type: 'PRO_UNLOCK_FAIL'; error: string }
+
+  // payment
+  | { type: 'PAYMENT_START' }
+  | { type: 'PAYMENT_OK'; token: string; expiresAt: string }
+  | { type: 'PAYMENT_FAIL'; error: string }
+  | { type: 'PAYMENT_RESET' }

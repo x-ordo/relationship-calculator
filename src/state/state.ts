@@ -41,6 +41,7 @@ export function initialState(): AppState {
     proUi: {
       unlockCode: '',
       unlock: idle(),
+      payment: idle(),
     },
   }
 }

@@ -4,6 +4,7 @@ import type { AppState } from '../../state/state'
 import type { AppEvent } from '../../state/events'
 import { buildReport } from '../../shared/domain/report'
 import type { CoachTone, CoachContext, CoachResult } from '../../shared/rules/fakeCoach'
+import { VoiceInputButton } from '../common/VoiceInputButton'
 
 type Actions = {
   runCoach: () => any
@@ -116,7 +117,18 @@ export function CoachPage({ state, dispatch, actions }: { state: AppState; dispa
         ))}
       </div>
 
-      <div class="h2" style={{ marginTop: 16 }}>상황 진술</div>
+      <div class="row" style={{ marginTop: 16, justifyContent: 'space-between', alignItems: 'center' }}>
+        <div class="h2" style={{ margin: 0 }}>상황 진술</div>
+        <VoiceInputButton
+          onTranscript={(text) => {
+            const newSituation = (draft.situation + ' ' + text).trim()
+            if (newSituation.length <= MAX_SITUATION_LENGTH + 50) {
+              dispatch({ type: 'COACH_DRAFT', patch: { situation: newSituation } })
+            }
+          }}
+          disabled={run.status === 'loading'}
+        />
+      </div>
       <textarea
         class="textarea"
         placeholder="예: 매번 일방적으로 부탁만 하는데, 거절하면 기분 상할까봐 못 끊겠음"
@@ -252,6 +264,36 @@ export function CoachPage({ state, dispatch, actions }: { state: AppState; dispa
               {run.data.disclaimer}
             </div>
           )}
+
+          {/* 소셜 공유 */}
+          <div class="h2" style={{ marginTop: 20 }}>판결 공유</div>
+          <div class="row" style={{ marginTop: 10, gap: 8 }}>
+            <button
+              class="btn"
+              onClick={() => {
+                const text = `[관계 감사 법원 판결]\n\n${run.data.title}\n등급: ${GRADE_LABELS[run.data.grade]}\n\n${run.data.verdict}\n\n#관계ROI #손익계산`
+                if (navigator.share) {
+                  navigator.share({ text }).catch(() => {})
+                } else {
+                  navigator.clipboard.writeText(text)
+                  alert('클립보드에 복사되었습니다!')
+                }
+              }}
+            >
+              📤 공유하기
+            </button>
+            <button
+              class="btn"
+              onClick={() => {
+                const text = `[관계 감사 법원 판결]\n\n${run.data.title}\n등급: ${GRADE_LABELS[run.data.grade]}\n\n${run.data.verdict}`
+                navigator.clipboard.writeText(text)
+                alert('클립보드에 복사되었습니다!')
+              }}
+            >
+              📋 전체 복사
+            </button>
+          </div>
+          <div class="hint" style={{ marginTop: 6 }}>카카오톡, 인스타 스토리 등에 붙여넣기 하세요.</div>
         </div>
       )}
     </div>

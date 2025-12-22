@@ -2,7 +2,7 @@
   color-scheme: dark;
 
   /* ========================================
-     Fluent 2 Design System - Dark Theme
+     Fluent 2 Design System - Dark Theme (Default)
      ======================================== */
 
   /* Color - Neutral Background */
@@ -156,6 +156,74 @@
   --accent: var(--colorBrandBackground);
   --danger: var(--colorStatusDangerForeground1);
   --ok: var(--colorStatusSuccessForeground1);
+}
+
+/* ========================================
+   Light Theme
+   ======================================== */
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Color - Neutral Background */
+  --colorNeutralBackground1: #ffffff;
+  --colorNeutralBackground1Hover: #f5f5f5;
+  --colorNeutralBackground1Pressed: #e0e0e0;
+  --colorNeutralBackground2: #fafafa;
+  --colorNeutralBackground3: #f5f5f5;
+  --colorNeutralBackground4: #ebebeb;
+  --colorNeutralBackgroundDisabled: #f0f0f0;
+
+  /* Color - Neutral Foreground */
+  --colorNeutralForeground1: #242424;
+  --colorNeutralForeground2: #424242;
+  --colorNeutralForeground3: #616161;
+  --colorNeutralForeground4: #757575;
+  --colorNeutralForegroundDisabled: #bdbdbd;
+
+  /* Color - Neutral Stroke */
+  --colorNeutralStroke1: #d1d1d1;
+  --colorNeutralStroke1Hover: #c7c7c7;
+  --colorNeutralStroke1Pressed: #b3b3b3;
+  --colorNeutralStroke2: #e0e0e0;
+  --colorNeutralStrokeDisabled: #e0e0e0;
+
+  /* Color - Brand */
+  --colorBrandBackground: #0f6cbd;
+  --colorBrandBackgroundHover: #115ea3;
+  --colorBrandBackgroundPressed: #0c5388;
+  --colorBrandBackgroundSelected: #0c5388;
+  --colorBrandForeground1: #0f6cbd;
+  --colorBrandForeground2: #115ea3;
+  --colorBrandStroke1: #0f6cbd;
+
+  /* Color - Subtle */
+  --colorSubtleBackground: transparent;
+  --colorSubtleBackgroundHover: rgba(0,0,0,0.04);
+  --colorSubtleBackgroundPressed: rgba(0,0,0,0.06);
+  --colorSubtleBackgroundSelected: rgba(0,0,0,0.08);
+
+  /* Color - Status */
+  --colorStatusDangerBackground1: rgba(196,49,75,0.1);
+  --colorStatusDangerBackground2: rgba(196,49,75,0.2);
+  --colorStatusDangerForeground1: #c4314b;
+  --colorStatusDangerForeground2: #a42e3e;
+  --colorStatusSuccessBackground1: rgba(16,124,16,0.1);
+  --colorStatusSuccessBackground2: rgba(16,124,16,0.2);
+  --colorStatusSuccessForeground1: #107c10;
+  --colorStatusSuccessForeground2: #0e6b0e;
+  --colorStatusWarningBackground1: rgba(234,179,8,0.1);
+  --colorStatusWarningForeground1: #c19c00;
+
+  /* Shadow - lighter for light mode */
+  --shadow2: 0 1px 2px rgba(0,0,0,0.12);
+  --shadow4: 0 2px 4px rgba(0,0,0,0.14);
+  --shadow8: 0 4px 8px rgba(0,0,0,0.14);
+  --shadow16: 0 8px 16px rgba(0,0,0,0.14);
+  --shadow28: 0 14px 28px rgba(0,0,0,0.18);
+
+  /* Focus Ring */
+  --focusStrokeOuter: #000000;
+  --focusStrokeInner: #ffffff;
 }
 
 /* ========================================
@@ -1188,4 +1256,98 @@ a:hover { color: var(--colorBrandForeground2); }
   );
   background-size: 12px 12px;
   background-position: 0 0;
+}
+
+/* ========================================
+   Bottom Navigation (Mobile)
+   ======================================== */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--colorNeutralBackground2);
+  border-top: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  padding: var(--spacingS);
+  padding-bottom: calc(var(--spacingS) + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.2);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacingXXS);
+  padding: var(--spacingXS) var(--spacingS);
+  background: transparent;
+  border: none;
+  border-radius: var(--borderRadiusMedium);
+  color: var(--colorNeutralForeground3);
+  cursor: pointer;
+  transition: all var(--durationFast) var(--curveEasyEase);
+}
+
+.bottom-nav-item:hover {
+  background: var(--colorSubtleBackgroundHover);
+  color: var(--colorNeutralForeground2);
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.95);
+}
+
+.bottom-nav-item.active {
+  color: var(--colorBrandForeground1);
+}
+
+.bottom-nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: calc(var(--spacingXXS) + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: var(--colorBrandBackground);
+  border-radius: var(--borderRadiusCircular);
+}
+
+.bottom-nav-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.bottom-nav-label {
+  font-size: var(--fontSizeBase100);
+  font-weight: var(--fontWeightSemibold);
+}
+
+/* Show bottom nav on mobile, hide topbar tabs */
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex;
+  }
+
+  /* Hide topbar tabs on mobile */
+  .topbar .tabs {
+    display: none;
+  }
+
+  /* Add padding at bottom for content */
+  .app {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Adjust FAB position to account for bottom nav */
+  .fab {
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Ensure bottom nav item is relatively positioned for ::after */
+.bottom-nav-item {
+  position: relative;
 }

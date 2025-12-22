@@ -11,7 +11,9 @@ import { WeeklySummaryCard } from './WeeklySummaryCard'
 import { ReceiptCard } from './ReceiptCard'
 import { EditEntryModal } from './EditEntryModal'
 import { BackupRestoreCard } from './BackupRestoreCard'
-import type { Entry } from '../../shared/storage/state'
+import { InsightBanner } from './InsightBanner'
+import { PersonDetailPage } from '../person/PersonDetailPage'
+import type { Entry, Person } from '../../shared/storage/state'
 import {
   validatePersonName,
   validateEntry,
@@ -38,6 +40,7 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
   const [viewFilter, setViewFilter] = useState<ViewFilter>('all')
   const [isClientNew, setIsClientNew] = useState(false)
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null)
+  const [detailPerson, setDetailPerson] = useState<Person | null>(null)
   const [filterPersonId, setFilterPersonId] = useState('')
   const [filterCause, setFilterCause] = useState<CauseKey | ''>('')
 
@@ -157,6 +160,9 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
         )}
       </div>
 
+      {/* 인사이트 배너 */}
+      <InsightBanner domain={domain} />
+
       {/* Header with B2B Tabs */}
       <div class="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <div>
@@ -234,7 +240,7 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
           <div class="list" style={{ marginTop: 10 }}>
             {filteredPeople.length === 0 && <div class="hint">비어있음. 사람 1명 추가하고 '오늘 10초 기록'부터.</div>}
             {filteredPeople.map(p => (
-              <div class="listItem">
+              <div class="listItem" style={{ cursor: 'pointer' }} onClick={() => setDetailPerson(p)}>
                 <div>
                   <div style={{ fontWeight: 800 }}>
                     {p.name}
@@ -242,8 +248,9 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
                   </div>
                   <div class="hint">기록: {domain.entries.filter(e => e.personId === p.id).length}개</div>
                 </div>
-                <div class="row">
+                <div class="row" onClick={(e) => e.stopPropagation()}>
                   <button class="btn" onClick={() => setEntryPersonId(p.id)}>선택</button>
+                  <button class="btn subtle" onClick={() => setDetailPerson(p)}>상세</button>
                   <button class="btn danger" onClick={() => removePerson(p.id)}>삭제</button>
                 </div>
               </div>
@@ -407,6 +414,16 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
           domain={domain}
           dispatch={dispatch}
           onClose={() => setEditingEntry(null)}
+        />
+      )}
+
+      {/* 사람 상세 페이지 */}
+      {detailPerson && (
+        <PersonDetailPage
+          domain={domain}
+          person={detailPerson}
+          dispatch={dispatch}
+          onClose={() => setDetailPerson(null)}
         />
       )}
 

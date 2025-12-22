@@ -65,6 +65,8 @@ export function QuickLogBar({ domain, dispatch, personId, setPersonId, onSaved, 
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
   const [activePreset, setActivePreset] = useState<string | null>(null)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [pendingEntry, setPendingEntry] = useState<Entry | null>(null)
 
   /** 프리셋 적용 */
   const applyPreset = (preset: Preset) => {
@@ -81,6 +83,7 @@ export function QuickLogBar({ domain, dispatch, personId, setPersonId, onSaved, 
 
   const canSave = hasPeople && !!personId
 
+  /** 저장 버튼: validation 후 확인 모달 표시 */
   const save = () => {
     setError('')
     if (!canSave) return
@@ -114,12 +117,27 @@ export function QuickLogBar({ domain, dispatch, personId, setPersonId, onSaved, 
       boundaryHit,
       note: '',
     }
-    dispatch({ type: 'ENTRY_ADD', entry })
+    setPendingEntry(entry)
+    setConfirmOpen(true)
+  }
+
+  /** 확인 모달에서 "저장" 클릭 */
+  const confirmSave = () => {
+    if (!pendingEntry) return
+    dispatch({ type: 'ENTRY_ADD', entry: pendingEntry })
     setSaved(true)
+    setConfirmOpen(false)
+    setPendingEntry(null)
     try { onSaved?.() } catch {}
     setBoundaryHit(false)
     setActivePreset(null)
     window.setTimeout(() => setSaved(false), 900)
+  }
+
+  /** 확인 모달에서 "취소" 클릭 */
+  const cancelSave = () => {
+    setConfirmOpen(false)
+    setPendingEntry(null)
   }
 
   return (
@@ -251,6 +269,34 @@ export function QuickLogBar({ domain, dispatch, personId, setPersonId, onSaved, 
             </div>
           </div>
         </>
+      )}
+
+      {/* 확인 모달 */}
+      {confirmOpen && pendingEntry && (
+        <div class="sheetOverlay" onClick={(e) => { if (e.target === e.currentTarget) cancelSave() }}>
+          <div class="sheet" style={{ maxWidth: 400 }}>
+            <div class="h2" style={{ margin: 0 }}>기록 확인</div>
+            <div class="hint" style={{ marginTop: 4 }}>아래 내용으로 저장할까요?</div>
+
+            <div class="card" style={{ marginTop: 12, background: 'var(--colorNeutralBackground3)' }}>
+              <div style={{ fontWeight: 700 }}>{people.find(p => p.id === pendingEntry.personId)?.name || '(unknown)'}</div>
+              <div class="hint" style={{ marginTop: 6 }}>
+                {pendingEntry.minutes}분 · ₩{pendingEntry.moneyWon.toLocaleString()} ·
+                기분 {pendingEntry.moodDelta > 0 ? '+' : ''}{pendingEntry.moodDelta} ·
+                상호성 {pendingEntry.reciprocity}
+                {pendingEntry.boundaryHit && <span class="pillMini danger" style={{ marginLeft: 6 }}>경계 침해</span>}
+              </div>
+              <div class="hint danger" style={{ marginTop: 4 }}>
+                시간 비용: -₩{Math.round((pendingEntry.minutes / 60) * hourlyRate).toLocaleString()}
+              </div>
+            </div>
+
+            <div class="row" style={{ marginTop: 14, justifyContent: 'flex-end', gap: 8 }}>
+              <button class="btn" onClick={cancelSave}>취소</button>
+              <button class="btn primary" onClick={confirmSave}>저장</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

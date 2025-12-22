@@ -1,17 +1,24 @@
 /** @jsxImportSource preact */
-import { useEffect, useMemo, useReducer, useRef } from 'preact/hooks'
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'preact/hooks'
 import { DashboardPage } from './components/dashboard/DashboardPage'
 import { CoachPage } from './components/coach/CoachPage'
 import { SharePage } from './components/share/SharePage'
 import { ProPage } from './components/pro/ProPage'
 import { OnboardingOverlay, needsOnboarding } from './components/onboarding/OnboardingOverlay'
+import { BottomNav } from './components/nav/BottomNav'
 import { reducer } from './state/reducer'
 import { initialState, type AppState } from './state/state'
+import type { Tab } from './state/ui'
 import { initApp, persistDomain, runCoach, unlockPro, purchasePro, checkPaymentCallback } from './state/actions'
 import type { ProductId } from './shared/payment/portone'
+import { initTheme, cycleTheme, saveTheme, applyTheme, themeIcon, themeLabel, type Theme } from './shared/utils/theme'
+import { useSwipe } from './shared/hooks/useSwipe'
+
+const TAB_ORDER: Tab[] = ['dashboard', 'coach', 'share', 'pro']
 
 export function App() {
   const [state, dispatch] = useReducer(reducer, undefined, initialState)
+  const [theme, setTheme] = useState<Theme>('dark')
 
   const stateRef = useRef<AppState>(state)
   useEffect(() => {
@@ -19,11 +26,19 @@ export function App() {
   }, [state])
   const getState = () => stateRef.current
 
-  // init: load persisted domain + check payment callback
+  // init: load persisted domain + check payment callback + theme
   useEffect(() => {
     initApp(dispatch)
     checkPaymentCallback(dispatch)
+    setTheme(initTheme())
   }, [])
+
+  const toggleTheme = () => {
+    const next = cycleTheme(theme)
+    setTheme(next)
+    saveTheme(next)
+    applyTheme(next)
+  }
 
   // persist domain when ready (avoid overwriting storage during BOOT/LOADING)
   useEffect(() => {
@@ -42,6 +57,32 @@ export function App() {
 
   const tab = state.tab
   const isLoading = state.load.kind === 'BOOT' || state.load.kind === 'LOADING'
+
+  // Tab change handler
+  const handleTabChange = useCallback((newTab: Tab) => {
+    dispatch({ type: 'SET_TAB', tab: newTab })
+  }, [])
+
+  // Swipe gesture for tab navigation (mobile)
+  const handleSwipe = useCallback((direction: 'left' | 'right') => {
+    const currentIndex = TAB_ORDER.indexOf(tab)
+    if (currentIndex === -1) return
+
+    let newIndex: number
+    if (direction === 'left') {
+      // Swipe left = next tab
+      newIndex = Math.min(currentIndex + 1, TAB_ORDER.length - 1)
+    } else {
+      // Swipe right = previous tab
+      newIndex = Math.max(currentIndex - 1, 0)
+    }
+
+    if (newIndex !== currentIndex) {
+      dispatch({ type: 'SET_TAB', tab: TAB_ORDER[newIndex] })
+    }
+  }, [tab])
+
+  useSwipe({ onSwipe: handleSwipe, threshold: 80 })
 
   return (
     <div class="app">
@@ -79,6 +120,9 @@ export function App() {
             PRO
           </button>
         </div>
+        <button class="btn" onClick={toggleTheme} title={`테마: ${themeLabel(theme)}`} style={{ marginLeft: 8 }}>
+          {themeIcon(theme)}
+        </button>
       </div>
 
       {isLoading ? (
@@ -97,6 +141,8 @@ export function App() {
         )}
         </>
       )}
+
+      <BottomNav tab={tab} onTabChange={handleTabChange} />
 
       <div class="footer">
         <div class="hint">데이터는 브라우저 로컬에만 저장됩니다. (서버 전송 없음)</div>

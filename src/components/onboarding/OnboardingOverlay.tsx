@@ -120,7 +120,7 @@ export function OnboardingOverlay({ domain, dispatch }: { domain: DomainState; d
 
   const StepDots = () => (
     <div class="obDots">
-      {[0,1,2,3,4].map(i => (
+      {[0,1,2,3,4,5].map(i => (
         <div class={`obDot ${i<=step ? 'on' : ''}`}></div>
       ))}
     </div>
@@ -393,8 +393,60 @@ export function OnboardingOverlay({ domain, dispatch }: { domain: DomainState; d
 
             <div class="row" style={{ justifyContent: 'space-between', marginTop: 14 }}>
               <button class="btn" onClick={() => setStep(3)}>이전</button>
+              <button class="btn primary" onClick={() => setStep(5)}>다음</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 5: 다음 할 일 */}
+        {step === 5 && (
+          <div style={{ marginTop: 14 }}>
+            {header('준비 완료! 다음은?', '기록 → 분석 → 공유. 이 루틴이 쌓이면 칼이 된다.')}
+
+            <div class="grid cols-3" style={{ marginTop: 14, gap: 12 }}>
+              <button
+                class="card"
+                style={{ cursor: 'pointer', textAlign: 'left', border: '2px solid var(--colorNeutralStroke1)' }}
+                onClick={() => { completeOnboarding(dispatch); dispatch({ type: 'SET_TAB', tab: 'dashboard' }) }}
+              >
+                <div style={{ fontSize: 32, marginBottom: 8 }}>📝</div>
+                <div class="h2" style={{ margin: 0 }}>기록 추가</div>
+                <div class="hint" style={{ marginTop: 4 }}>10초면 된다. 시간/돈/감정만 찍어.</div>
+                <div class="pill" style={{ marginTop: 8 }}>추천</div>
+              </button>
+
+              <button
+                class="card"
+                style={{ cursor: 'pointer', textAlign: 'left', border: '2px solid var(--colorNeutralStroke1)' }}
+                onClick={() => { completeOnboarding(dispatch); dispatch({ type: 'SET_TAB', tab: 'coach' }) }}
+              >
+                <div style={{ fontSize: 32, marginBottom: 8 }}>⚖️</div>
+                <div class="h2" style={{ margin: 0 }}>코치 판결</div>
+                <div class="hint" style={{ marginTop: 4 }}>거절 문구가 필요하면 여기서 뽑아.</div>
+              </button>
+
+              <button
+                class="card"
+                style={{ cursor: 'pointer', textAlign: 'left', border: '2px solid var(--colorNeutralStroke1)' }}
+                onClick={() => { completeOnboarding(dispatch); dispatch({ type: 'SET_TAB', tab: 'share' }) }}
+              >
+                <div style={{ fontSize: 32, marginBottom: 8 }}>📤</div>
+                <div class="h2" style={{ margin: 0 }}>공유 카드</div>
+                <div class="hint" style={{ marginTop: 4 }}>익명화된 카드로 스토리에 올려.</div>
+              </button>
+            </div>
+
+            <div class="callout" style={{ marginTop: 14 }}>
+              <div style={{ fontWeight: 700 }}>💡 팁: 매일 10초 기록</div>
+              <div class="hint" style={{ marginTop: 4 }}>
+                기록이 쌓이면 패턴이 보인다. 패턴이 보이면 손절이 쉬워진다.
+              </div>
+            </div>
+
+            <div class="row" style={{ justifyContent: 'space-between', marginTop: 14 }}>
+              <button class="btn" onClick={() => setStep(4)}>이전</button>
               <button class="btn primary" onClick={() => { completeOnboarding(dispatch); dispatch({ type: 'SET_TAB', tab: 'dashboard' }) }}>
-                끝내기
+                대시보드로 시작
               </button>
             </div>
           </div>

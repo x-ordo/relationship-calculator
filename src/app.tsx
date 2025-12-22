@@ -146,7 +146,7 @@ export function App() {
 
       <div class="footer">
         <div class="hint">데이터는 브라우저 로컬에만 저장됩니다. (서버 전송 없음)</div>
-        <div class="hint">MVP v0.5.8 · Preact + Vite · useReducer + State Machine</div>
+        <div class="hint">MVP v0.6.0 · Preact + Vite · useReducer + State Machine</div>
       </div>
     </div>
   )

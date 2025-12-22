@@ -36,4 +36,12 @@ pnpm dev
 ## 주의
 
 - 이 앱은 **의료/심리 치료 도구가 아닙니다.**
-- 공유 기능은 “신상 노출”로 번지기 쉬우니, 익명화/체크리스트를 강제합니다.
+- 공유 기능은 "신상 노출"로 번지기 쉬우니, 익명화/체크리스트를 강제합니다.
+
+## License
+
+Copyright (c) 2025 Prometheus-P. All Rights Reserved.
+
+This is proprietary software. Unauthorized copying, modification, or distribution is strictly prohibited.
+
+For licensing inquiries: parkdavid31@gmail.com

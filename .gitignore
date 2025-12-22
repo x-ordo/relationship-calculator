@@ -41,3 +41,26 @@ pnpm-debug.log*
 
 # Misc
 *.local
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.parcel-cache/
+.turbo/
+
+# Credentials & secrets (NEVER commit)
+credentials.json
+secrets.json
+*.pem
+*.key
+
+# OS generated files
+*.orig
+ehthumbs.db
+Desktop.ini
+
+# Package managers
+.pnpm-store/

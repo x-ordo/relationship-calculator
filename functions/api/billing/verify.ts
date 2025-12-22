@@ -3,6 +3,9 @@
  * PortOne V2 결제 검증 및 PRO 토큰 발급
  */
 
+import { json, badRequest, serverError } from '../../utils/response'
+import { issueToken } from '../../utils/token'
+
 export interface Env {
   /** PortOne V2 API Secret */
   PORTONE_API_SECRET: string
@@ -18,32 +21,6 @@ export interface Env {
 const PRICE_TABLE: Record<string, number> = {
   'pro_monthly': 9900,
   'pro_yearly': 99000,
-}
-
-function json(data: any, init: ResponseInit = {}) {
-  return new Response(JSON.stringify(data), {
-    ...init,
-    headers: { 'Content-Type': 'application/json; charset=utf-8', ...(init.headers || {}) },
-  })
-}
-
-function badRequest(message: string) {
-  return json({ error: message }, { status: 400 })
-}
-
-function unauthorized(message: string) {
-  return json({ error: message }, { status: 401 })
-}
-
-/**
- * 암호학적으로 안전한 토큰 생성
- * 형식: {prefix}_{timestamp_base36}_{uuid}_{expiry_base36}
- */
-function issueToken(prefix: string, expiryDays: number) {
-  const rand = crypto.randomUUID().replace(/-/g, '').slice(0, 16)
-  const ts = Date.now().toString(36)
-  const expiry = (Date.now() + expiryDays * 86400000).toString(36)
-  return `${prefix}_${ts}_${rand}_${expiry}`
 }
 
 /**
@@ -69,7 +46,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   // 환경변수 검증
   if (!ctx.env.PORTONE_API_SECRET) {
     console.error('[verify] PORTONE_API_SECRET not configured')
-    return json({ error: '결제 시스템 설정 오류' }, { status: 500 })
+    return serverError('결제 시스템 설정 오류')
   }
 
   let body: any
@@ -149,6 +126,6 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
   } catch (e: any) {
     console.error('[verify] Error:', e)
-    return json({ error: '결제 검증 중 오류가 발생했습니다' }, { status: 500 })
+    return serverError('결제 검증 중 오류가 발생했습니다')
   }
 }

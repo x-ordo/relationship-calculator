@@ -1,3 +1,6 @@
+import { json, badRequest, unauthorized } from '../../utils/response'
+import { getBearer, getClientIP, isTokenExpired } from '../../utils/token'
+
 export interface Env {
   LLM_BASE_URL: string
   LLM_API_KEY: string
@@ -28,46 +31,10 @@ type CoachResponse = {
   disclaimer: string
 }
 
-function json(data: any, init: ResponseInit = {}) {
-  return new Response(JSON.stringify(data), {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      ...(init.headers || {}),
-    },
-  })
-}
-
-function unauthorized(message = 'unauthorized') {
-  return json({ error: message }, { status: 401 })
-}
-
-function badRequest(message = 'bad request') {
-  return json({ error: message }, { status: 400 })
-}
-
-function getBearer(req: Request) {
-  const h = req.headers.get('Authorization') || ''
-  const m = h.match(/^Bearer\s+(.+)$/i)
-  return m?.[1] || ''
-}
-
 function isAllowed(token: string, env: Env) {
   const allow = (env.PRO_TOKENS || '').split(',').map(s => s.trim()).filter(Boolean)
   if (allow.length === 0) return true // MVP: allow-all if env not set
   return allow.includes(token)
-}
-
-/**
- * 토큰 만료 여부 확인
- * 토큰 형식: {prefix}_{timestamp}_{uuid}_{expiry}
- */
-function isTokenExpired(token: string): boolean {
-  const parts = token.split('_')
-  if (parts.length < 4) return false // 구형 토큰은 만료 체크 생략 (하위 호환)
-  const expiry = parseInt(parts[3], 36)
-  if (isNaN(expiry)) return false
-  return Date.now() > expiry
 }
 
 /**
@@ -113,15 +80,6 @@ async function checkRateLimit(
 
   await kv.put(key, String(count + 1), { expirationTtl: 120 })
   return { allowed: true, remaining: limit - count - 1 }
-}
-
-/**
- * 클라이언트 IP 추출
- */
-function getClientIP(req: Request): string {
-  return req.headers.get('CF-Connecting-IP') ||
-    req.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() ||
-    'unknown'
 }
 
 function buildSystemPrompt(context: AllowedContext) {
@@ -257,8 +215,8 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     return unauthorized('PRO token required')
   }
 
-  // 2. 토큰 만료 검증
-  if (isTokenExpired(token)) {
+  // 2. 토큰 만료 검증 (구형 토큰은 만료 체크 생략 - 하위 호환)
+  if (isTokenExpired(token, true)) {
     return unauthorized('토큰이 만료되었습니다. PRO를 갱신해주세요.')
   }
 

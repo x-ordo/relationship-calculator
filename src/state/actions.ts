@@ -6,6 +6,7 @@ import { fakeCoach } from '../shared/rules/fakeCoach'
 import { callPaidCoach, toCoachPayload } from '../shared/api/coachApi'
 import { maskPii } from '../shared/privacy/pii'
 import { requestPayment, handlePaymentCallback, type ProductId } from '../shared/payment/portone'
+import { checkFreeCoachLimit, incrementFreeCoachUsage } from '../shared/utils/freeLimit'
 
 export type Dispatch = (e: AppEvent) => void
 export type GetState = () => AppState
@@ -152,9 +153,21 @@ export async function runCoach(dispatch: Dispatch, getState: GetState) {
     }
   }
 
-  // FREE path
+  // FREE path - 1일 3회 제한
+  const freeLimit = checkFreeCoachLimit()
+  if (!freeLimit.allowed) {
+    dispatch({ type: 'COACH_NEED_PRO', need: true })
+    dispatch({
+      type: 'COACH_RUN_FAIL',
+      error: `오늘 무료 사용량(${freeLimit.usedToday}회)을 모두 사용했습니다. PRO로 업그레이드하면 무제한 사용 가능합니다.`
+    })
+    return
+  }
+
   try {
+    incrementFreeCoachUsage()
     const result = fakeCoach({ report, situation, tone, context })
+    result.disclaimer = `${result.disclaimer}\n(무료: 오늘 ${freeLimit.usedToday + 1}/3회 사용)`
     dispatch({ type: 'COACH_RUN_OK', data: result })
   } catch (e) {
     dispatch({ type: 'COACH_RUN_FAIL', error: toUserFriendlyError(e) })

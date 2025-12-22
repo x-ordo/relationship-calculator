@@ -17,7 +17,10 @@ export type AppEvent =
   | { type: 'PERSON_ADD'; person: Person }
   | { type: 'PERSON_DELETE'; personId: string }
   | { type: 'ENTRY_ADD'; entry: Entry }
+  | { type: 'ENTRY_EDIT'; entryId: string; patch: Partial<Omit<Entry, 'id' | 'personId'>> }
   | { type: 'ENTRY_DELETE'; entryId: string }
+
+  | { type: 'BACKUP_RESTORE'; settings: AppSettings; people: Person[]; entries: Entry[] }
 
   // coach ui
   | { type: 'COACH_DRAFT'; patch: Partial<{ tone: CoachTone; situation: string; context: CoachContext }> }

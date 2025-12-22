@@ -92,19 +92,31 @@ export function causeLabel(k: CauseKey): string {
   }
 }
 
-export function buildReport(state: AppState, opts?: { month?: string; range?: ReportRange }):
+export type ReportFilter = {
+  month?: string
+  range?: ReportRange
+  personId?: string
+  cause?: CauseKey
+}
+
+export function buildReport(state: AppState, opts?: ReportFilter):
   Report {
   const month = opts?.month // 'YYYY-MM'
   const range = opts?.range
+  const personIdFilter = opts?.personId
+  const causeFilter = opts?.cause
   const timeValue = state.settings.timeValuePerHourWon
 
   const peopleMap = new Map<string, Person>()
   for (const p of state.people) peopleMap.set(p.id, p)
 
   const entries = state.entries.filter(e => {
-    if (range) return e.date >= range.start && e.date <= range.end
-    if (!month) return true
-    return e.date.startsWith(month)
+    // 날짜 필터
+    if (range && (e.date < range.start || e.date > range.end)) return false
+    if (month && !e.date.startsWith(month)) return false
+    // 사람 필터
+    if (personIdFilter && e.personId !== personIdFilter) return false
+    return true
   })
 
   const agg = new Map<string, {
@@ -174,10 +186,15 @@ export function buildReport(state: AppState, opts?: { month?: string; range?: Re
     }
   })
 
-  // “손해 큰 순”으로 정렬
-  people.sort((x, y) => y.netLossWon - x.netLossWon)
+  // 원인별 필터
+  const filteredPeople = causeFilter
+    ? people.filter(p => p.topCause === causeFilter)
+    : people
 
-  const totals = people.reduce(
+  // "손해 큰 순"으로 정렬
+  filteredPeople.sort((x, y) => y.netLossWon - x.netLossWon)
+
+  const totals = filteredPeople.reduce(
     (t, p) => {
       t.entries += p.entries
       t.minutes += p.minutes
@@ -195,7 +212,7 @@ export function buildReport(state: AppState, opts?: { month?: string; range?: Re
 
   // top cause overall: 가장 많이 등장한 topCause
   const causeCount = new Map<CauseKey, number>()
-  for (const p of people) causeCount.set(p.topCause, (causeCount.get(p.topCause) || 0) + 1)
+  for (const p of filteredPeople) causeCount.set(p.topCause, (causeCount.get(p.topCause) || 0) + 1)
   let topCause: CauseKey = 'TIME'
   let topCauseN = -1
   for (const [k, n] of causeCount.entries()) {
@@ -205,13 +222,13 @@ export function buildReport(state: AppState, opts?: { month?: string; range?: Re
     }
   }
 
-  const topPersonLabel = people[0]?.personName || '—'
+  const topPersonLabel = filteredPeople[0]?.personName || '—'
 
   return {
     windowLabel: range ? range.label : (month ? `${month} 결산` : '전체 결산'),
     timeValuePerHourWon: timeValue,
     totals: { ...totals, roiPct },
-    people,
+    people: filteredPeople,
     topCauseLabel: causeLabel(topCause),
     topPersonLabel,
   }

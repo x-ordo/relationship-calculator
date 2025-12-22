@@ -3,12 +3,15 @@ import { useMemo, useState } from 'preact/hooks'
 import type { AppState as DomainState } from '../../shared/storage/state'
 import type { AppEvent } from '../../state/events'
 import { uid } from '../../shared/storage/state'
-import { buildReport, causeLabel } from '../../shared/domain/report'
+import { buildReport, causeLabel, type CauseKey } from '../../shared/domain/report'
 import { QuickLogBar } from './QuickLogBar'
 import { QuickLogSheet } from './QuickLogSheet'
 import { QuickLogFab } from './QuickLogFab'
 import { WeeklySummaryCard } from './WeeklySummaryCard'
 import { ReceiptCard } from './ReceiptCard'
+import { EditEntryModal } from './EditEntryModal'
+import { BackupRestoreCard } from './BackupRestoreCard'
+import type { Entry } from '../../shared/storage/state'
 import {
   validatePersonName,
   validateEntry,
@@ -34,6 +37,9 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
   const [quickOpen, setQuickOpen] = useState(false)
   const [viewFilter, setViewFilter] = useState<ViewFilter>('all')
   const [isClientNew, setIsClientNew] = useState(false)
+  const [editingEntry, setEditingEntry] = useState<Entry | null>(null)
+  const [filterPersonId, setFilterPersonId] = useState('')
+  const [filterCause, setFilterCause] = useState<CauseKey | ''>('')
 
   // Filter people by view filter
   const filteredPeople = useMemo(() => {
@@ -59,9 +65,12 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
 
   const report = useMemo(() => {
     const monthValidation = validateMonth(month)
-    if (!monthValidation.valid) return buildReport(domain)
-    return buildReport(domain, month ? { month } : undefined)
-  }, [domain, month])
+    const opts: { month?: string; personId?: string; cause?: CauseKey } = {}
+    if (monthValidation.valid && month) opts.month = month
+    if (filterPersonId) opts.personId = filterPersonId
+    if (filterCause) opts.cause = filterCause
+    return buildReport(domain, opts)
+  }, [domain, month, filterPersonId, filterCause])
 
   const handleMonthChange = (value: string) => {
     setMonth(value)
@@ -155,9 +164,21 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
           <div class="hint">사람/상황을 기록하면, 손익과 원인이 자동으로 뽑힌다.</div>
         </div>
         <div>
-          <div class="row">
-            <input class="input small" placeholder="YYYY-MM (예: 2025-12)" value={month} onInput={(e) => handleMonthChange((e.currentTarget as HTMLInputElement).value)} />
-            <button class="btn" onClick={() => { setMonth(''); setMonthError(''); }}>전체</button>
+          <div class="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+            <input class="input small" placeholder="YYYY-MM" value={month} onInput={(e) => handleMonthChange((e.currentTarget as HTMLInputElement).value)} style={{ width: 100 }} />
+            <select class="input small" value={filterPersonId} onChange={(e) => setFilterPersonId((e.currentTarget as HTMLSelectElement).value)} style={{ width: 100 }}>
+              <option value="">모든 사람</option>
+              {domain.people.map(p => <option value={p.id}>{p.name}</option>)}
+            </select>
+            <select class="input small" value={filterCause} onChange={(e) => setFilterCause((e.currentTarget as HTMLSelectElement).value as CauseKey | '')} style={{ width: 110 }}>
+              <option value="">모든 원인</option>
+              <option value="BOUNDARY">추가 비용</option>
+              <option value="TIME">인건비</option>
+              <option value="MONEY">직접 지출</option>
+              <option value="MOOD">감정세</option>
+              <option value="RECIPROCITY">투자 효율</option>
+            </select>
+            <button class="btn" onClick={() => { setMonth(''); setMonthError(''); setFilterPersonId(''); setFilterCause(''); }}>초기화</button>
           </div>
           {monthError && <div class="hint danger" style={{ marginTop: 4 }}>{monthError}</div>}
         </div>
@@ -365,13 +386,29 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
                     <div class="hint">{e.minutes}분 · ₩{e.moneyWon.toLocaleString()} · 기분 {e.moodDelta} · 상호성 {e.reciprocity} · {e.boundaryHit ? '경계침해' : '—'}</div>
                     {e.note && <div class="note">{e.note}</div>}
                   </div>
-                  <button class="btn danger" onClick={() => removeEntry(e.id)}>삭제</button>
+                  <div class="row">
+                    <button class="btn" onClick={() => setEditingEntry(e)}>수정</button>
+                    <button class="btn danger" onClick={() => removeEntry(e.id)}>삭제</button>
+                  </div>
                 </div>
               )
             })}
           </div>
         </div>
       </div>
+
+      {/* 백업/복원 */}
+      <BackupRestoreCard domain={domain} dispatch={dispatch} />
+
+      {/* 기록 수정 모달 */}
+      {editingEntry && (
+        <EditEntryModal
+          entry={editingEntry}
+          domain={domain}
+          dispatch={dispatch}
+          onClose={() => setEditingEntry(null)}
+        />
+      )}
 
 <QuickLogFab
   onClick={() => setQuickOpen(true)}

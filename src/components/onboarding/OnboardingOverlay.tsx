@@ -127,6 +127,15 @@ export function OnboardingOverlay({ domain, dispatch }: { domain: DomainState; d
   )
 
   const skip = () => {
+    // 기본 시급 설정 (설정 안 됐으면 평균값)
+    if (!domain.settings.timeValuePerHourWon || domain.settings.timeValuePerHourWon <= 0) {
+      dispatch({ type: 'SETTINGS_PATCH', patch: { timeValuePerHourWon: 25000 } })
+    }
+    // 사람 2명 자동 생성
+    ensureTwoPeople()
+    // 샘플 기록 자동 생성
+    seedDemo()
+    // 온보딩 완료
     completeOnboarding(dispatch)
   }
 

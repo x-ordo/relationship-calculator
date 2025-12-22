@@ -5,6 +5,26 @@ import type { AppEvent } from '../../state/events'
 import { uid } from '../../shared/storage/state'
 import { validateMinutes, validateMoneyWon } from '../../shared/utils/validation'
 
+/** 프리셋 템플릿: 자주 쓰는 상황 빠른 입력 */
+type Preset = {
+  id: string
+  label: string
+  emoji: string
+  minutes?: number
+  moneyWon?: number
+  moodDelta?: -2 | -1 | 0 | 1 | 2
+  reciprocity?: 1 | 2 | 3 | 4 | 5
+  boundaryHit?: boolean
+}
+
+const PRESETS: Preset[] = [
+  { id: 'boundary', label: '선 넘음', emoji: '🚨', moodDelta: -2, reciprocity: 1, boundaryHit: true },
+  { id: 'drain', label: '일방 소모', emoji: '🔋', moodDelta: -1, reciprocity: 2, boundaryHit: false },
+  { id: 'neutral', label: '그냥저냥', emoji: '😐', moodDelta: 0, reciprocity: 3, boundaryHit: false },
+  { id: 'mutual', label: '상호 이득', emoji: '🤝', moodDelta: 1, reciprocity: 5, boundaryHit: false },
+  { id: 'energy', label: '에너지 충전', emoji: '⚡', moodDelta: 2, reciprocity: 5, boundaryHit: false },
+]
+
 type Props = {
   domain: DomainState
   dispatch: (e: AppEvent) => void
@@ -44,6 +64,17 @@ export function QuickLogBar({ domain, dispatch, personId, setPersonId, onSaved, 
   const [boundaryHit, setBoundaryHit] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
+  const [activePreset, setActivePreset] = useState<string | null>(null)
+
+  /** 프리셋 적용 */
+  const applyPreset = (preset: Preset) => {
+    if (preset.minutes !== undefined) setMinutes(preset.minutes)
+    if (preset.moneyWon !== undefined) setMoneyWon(preset.moneyWon)
+    if (preset.moodDelta !== undefined) setMoodDelta(preset.moodDelta)
+    if (preset.reciprocity !== undefined) setReciprocity(preset.reciprocity)
+    if (preset.boundaryHit !== undefined) setBoundaryHit(preset.boundaryHit)
+    setActivePreset(preset.id)
+  }
 
   // Calculate time cost in Won
   const timeCostWon = useMemo(() => Math.round((minutes / 60) * hourlyRate), [minutes, hourlyRate])
@@ -87,6 +118,7 @@ export function QuickLogBar({ domain, dispatch, personId, setPersonId, onSaved, 
     setSaved(true)
     try { onSaved?.() } catch {}
     setBoundaryHit(false)
+    setActivePreset(null)
     window.setTimeout(() => setSaved(false), 900)
   }
 
@@ -117,6 +149,23 @@ export function QuickLogBar({ domain, dispatch, personId, setPersonId, onSaved, 
         </div>
       ) : (
         <>
+          {/* 프리셋 템플릿 */}
+          <div class="qGroup" style={{ marginTop: 10 }}>
+            <div class="qLabel">빠른 선택</div>
+            <div class="qButtons" style={{ flexWrap: 'wrap' }}>
+              {PRESETS.map(p => (
+                <button
+                  key={p.id}
+                  class={`qBtn ${activePreset === p.id ? 'on' : ''}`}
+                  onClick={() => applyPreset(p)}
+                  title={p.label}
+                >
+                  {p.emoji} {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div class="row" style={{ marginTop: 10 }}>
             <div class="qGroup">
               <div class="qLabel">대상 {isClient && <span class="pillMini" style={{ marginLeft: 4 }}>업무</span>}</div>

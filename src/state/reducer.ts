@@ -79,8 +79,33 @@ case 'PERSON_ADD': {
     case 'ENTRY_ADD':
       return { ...s, domain: { ...s.domain, entries: [e.entry, ...s.domain.entries] } }
 
+    case 'ENTRY_EDIT':
+      return {
+        ...s,
+        domain: {
+          ...s.domain,
+          entries: s.domain.entries.map(x => x.id === e.entryId ? { ...x, ...e.patch } : x),
+        },
+      }
+
     case 'ENTRY_DELETE':
       return { ...s, domain: { ...s.domain, entries: s.domain.entries.filter(x => x.id !== e.entryId) } }
+
+    case 'BACKUP_RESTORE': {
+      const people = e.people
+      return {
+        ...s,
+        domain: {
+          ...s.domain,
+          settings: e.settings,
+          people: e.people,
+          entries: e.entries,
+        },
+        dashboardUi: people.length === 0
+          ? { kind: 'EMPTY' }
+          : { kind: 'HAS_PEOPLE', selectedPersonId: people[0].id, entryFormOpen: false },
+      }
+    }
 
     // coach ui
     case 'COACH_DRAFT':

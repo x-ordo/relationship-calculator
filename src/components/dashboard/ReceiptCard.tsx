@@ -1,7 +1,7 @@
 /** @jsxImportSource preact */
 import { useMemo } from 'preact/hooks'
 import type { AppState as DomainState } from '../../shared/storage/state'
-import { buildReport, type Report } from '../../shared/domain/report'
+import { buildReport, calcReceiptLines } from '../../shared/domain/report'
 
 type Props = {
   domain: DomainState
@@ -20,41 +20,6 @@ function formatDate(d: Date) {
 function formatTime() {
   const now = new Date()
   return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
-}
-
-type ReceiptLine = {
-  label: string
-  amount: number
-  isSubtotal?: boolean
-  isTotal?: boolean
-  highlight?: boolean
-}
-
-function buildReceiptLines(report: Report, hourlyRate: number): ReceiptLine[] {
-  const t = report.totals
-  const timeCost = Math.round((t.minutes / 60) * hourlyRate)
-  const directCost = t.moneyWon
-  // 나머지는 costWon - timeCost - directCost (감정세+추가비용+투자효율손실)
-  const otherCosts = Math.max(0, t.costWon - timeCost - directCost)
-
-  const lines: ReceiptLine[] = [
-    { label: '인건비 (시간 환산)', amount: timeCost },
-    { label: '직접 지출', amount: directCost },
-    { label: '감정세 + 추가손실', amount: otherCosts },
-  ]
-
-  // 공급가액
-  lines.push({ label: '공급가액', amount: t.costWon, isSubtotal: true })
-
-  // 혜택 (benefit)
-  if (t.benefitWon > 0) {
-    lines.push({ label: '관계 혜택 (할인)', amount: -t.benefitWon })
-  }
-
-  // 합계
-  lines.push({ label: '총 손실액', amount: t.netLossWon, isTotal: true, highlight: true })
-
-  return lines
 }
 
 const VIRAL_FOOTERS = [
@@ -87,8 +52,8 @@ export function ReceiptCard({ domain, personId }: Props) {
     }
   }, [domain, personId])
 
-  const hourlyRate = domain.settings.timeValuePerHourWon
-  const lines = buildReceiptLines(report, hourlyRate)
+  const hourlyRate = domain.settings.hourlyRateWon
+  const lines = calcReceiptLines(report, hourlyRate)
   const hasData = report.totals.entries > 0
   const viralFooter = VIRAL_FOOTERS[Math.floor(Math.random() * VIRAL_FOOTERS.length)]
 

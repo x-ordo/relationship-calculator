@@ -43,7 +43,7 @@ function todayISO() {
 export function QuickLogBar({ domain, dispatch, personId, setPersonId, onSaved, compact }: Props) {
   const people = domain.people
   const hasPeople = people.length > 0
-  const hourlyRate = domain.settings.timeValuePerHourWon
+  const hourlyRate = domain.settings.hourlyRateWon
 
   // Get selected person to check if it's a client (B2B)
   const selectedPerson = useMemo(() => people.find(p => p.id === personId), [people, personId])

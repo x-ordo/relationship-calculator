@@ -21,7 +21,7 @@ export type PersonAggregate = {
 
 export type Report = {
   windowLabel: string
-  timeValuePerHourWon: number
+  hourlyRateWon: number
   totals: {
     entries: number
     minutes: number
@@ -46,8 +46,8 @@ export type ReportRange = {
   label: string
 }
 
-function calcEntryCost(e: Entry, timeValuePerHourWon: number) {
-  const timeCost = (e.minutes / 60) * timeValuePerHourWon
+function calcEntryCost(e: Entry, hourlyRateWon: number) {
+  const timeCost = (e.minutes / 60) * hourlyRateWon
   const boundaryPenalty = e.boundaryHit ? 15000 : 0
   // moodDelta < 0이면 멘탈 비용. 절대값이 클수록 비용 증가.
   const moodPenalty = e.moodDelta < 0 ? Math.abs(e.moodDelta) * 12000 : 0
@@ -105,7 +105,7 @@ export function buildReport(state: AppState, opts?: ReportFilter):
   const range = opts?.range
   const personIdFilter = opts?.personId
   const causeFilter = opts?.cause
-  const timeValue = state.settings.timeValuePerHourWon
+  const timeValue = state.settings.hourlyRateWon
 
   const peopleMap = new Map<string, Person>()
   for (const p of state.people) peopleMap.set(p.id, p)
@@ -226,10 +226,48 @@ export function buildReport(state: AppState, opts?: ReportFilter):
 
   return {
     windowLabel: range ? range.label : (month ? `${month} 결산` : '전체 결산'),
-    timeValuePerHourWon: timeValue,
+    hourlyRateWon: timeValue,
     totals: { ...totals, roiPct },
     people: filteredPeople,
     topCauseLabel: causeLabel(topCause),
     topPersonLabel,
   }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Receipt Line Items (공유 카드용 상세 breakdown)
+// ─────────────────────────────────────────────────────────────
+
+export type ReceiptLine = {
+  label: string
+  amount: number
+  isSubtotal?: boolean
+  isTotal?: boolean
+  highlight?: boolean
+}
+
+/**
+ * 리포트에서 영수증 라인 아이템 계산
+ * 공유 카드와 대시보드 ReceiptCard에서 공용 사용
+ */
+export function calcReceiptLines(report: Report, hourlyRate: number): ReceiptLine[] {
+  const { totals } = report
+
+  // 1. 인건비 (시간 → 원화)
+  const timeCost = Math.round((totals.minutes / 60) * hourlyRate)
+
+  // 2. 직접 지출
+  const directCost = totals.moneyWon
+
+  // 3. 감정세 + 경계 페널티 (총 비용에서 시간+직접 지출 빼면 나머지)
+  const emotionalTax = Math.max(0, totals.costWon - timeCost - directCost)
+
+  return [
+    { label: '인건비 (시간 환산)', amount: timeCost },
+    { label: '직접 지출', amount: directCost },
+    { label: '감정세 + 추가손실', amount: emotionalTax },
+    { label: '공급가액 (소계)', amount: totals.costWon, isSubtotal: true },
+    { label: '관계 혜택 (할인)', amount: -totals.benefitWon },
+    { label: '총 손실액', amount: totals.netLossWon, isTotal: true, highlight: true },
+  ]
 }

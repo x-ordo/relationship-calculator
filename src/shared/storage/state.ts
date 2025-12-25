@@ -33,7 +33,7 @@ export type Entitlement = {
 
 export type AppSettings = {
   /** 내 시간 1시간당 가치를 얼마로 칠지 (원) */
-  timeValuePerHourWon: number
+  hourlyRateWon: number
   /** 공유 카드에서 상대를 A/B/C로 바꿀지 */
   anonymizeOnShare: boolean
 
@@ -60,7 +60,7 @@ export const DEFAULT_STATE: AppState = {
   plan: 'free',
   entitlement: { token: '' },
   settings: {
-    timeValuePerHourWon: 20000,
+    hourlyRateWon: 9860, // 2024 최저시급 기준
     anonymizeOnShare: true,
     onboardingCompleted: false,
     onboardingVersion: 1,
@@ -82,6 +82,15 @@ export function loadAppState(): AppState {
       if (!raw) return DEFAULT_STATE
     }
     const parsed = JSON.parse(raw)
+
+    // 마이그레이션: timeValuePerHourWon → hourlyRateWon
+    if (parsed.settings) {
+      if ('timeValuePerHourWon' in parsed.settings && !('hourlyRateWon' in parsed.settings)) {
+        parsed.settings.hourlyRateWon = parsed.settings.timeValuePerHourWon
+        delete parsed.settings.timeValuePerHourWon
+      }
+    }
+
     return {
       ...DEFAULT_STATE,
       ...parsed,

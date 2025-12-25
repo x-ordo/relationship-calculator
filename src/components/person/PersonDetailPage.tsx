@@ -18,7 +18,7 @@ type WeeklyTrend = {
   avgMood: number
 }
 
-function getWeeklyTrends(entries: Entry[], timeValuePerHourWon: number): WeeklyTrend[] {
+function getWeeklyTrends(entries: Entry[], hourlyRateWon: number): WeeklyTrend[] {
   const now = new Date()
   const weeks: WeeklyTrend[] = []
 
@@ -40,7 +40,7 @@ function getWeeklyTrends(entries: Entry[], timeValuePerHourWon: number): WeeklyT
     let totalMood = 0
 
     for (const e of weekEntries) {
-      const timeCost = (e.minutes / 60) * timeValuePerHourWon
+      const timeCost = (e.minutes / 60) * hourlyRateWon
       const boundaryPenalty = e.boundaryHit ? 15000 : 0
       const moodPenalty = e.moodDelta < 0 ? Math.abs(e.moodDelta) * 12000 : 0
       const reciprocityPenalty = e.reciprocity <= 2 ? (3 - e.reciprocity) * 7000 : 0
@@ -86,8 +86,8 @@ export function PersonDetailPage({ domain, person, dispatch, onClose }: Props) {
   const personStats: PersonAggregate | undefined = report.people[0]
 
   const weeklyTrends = useMemo(
-    () => getWeeklyTrends(personEntries, domain.settings.timeValuePerHourWon),
-    [personEntries, domain.settings.timeValuePerHourWon]
+    () => getWeeklyTrends(personEntries, domain.settings.hourlyRateWon),
+    [personEntries, domain.settings.hourlyRateWon]
   )
 
   const categoryLabel = person.category === 'work' ? '직장' : person.category === 'family' ? '가족' : '개인'

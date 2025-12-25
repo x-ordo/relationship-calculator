@@ -2,8 +2,8 @@ export interface Env {
   LLM_BASE_URL: string
   LLM_API_KEY: string
   LLM_MODEL: string
-  /** comma-separated tokens */
-  PRO_TOKENS: string
+  /** HMAC 서명 시크릿 */
+  TOKEN_SECRET: string
   /** Cloudflare KV for rate limiting */
   RATE_LIMIT_KV?: KVNamespace
 }
@@ -52,21 +52,56 @@ function getBearer(req: Request) {
   return m?.[1] || ''
 }
 
-function isAllowed(token: string, env: Env) {
-  const allow = (env.PRO_TOKENS || '').split(',').map(s => s.trim()).filter(Boolean)
-  if (allow.length === 0) return true // MVP: allow-all if env not set
-  return allow.includes(token)
+/**
+ * HMAC-SHA256 서명 생성
+ * @returns base64url 인코딩된 서명 (12자)
+ */
+async function signPayload(payload: string, secret: string): Promise<string> {
+  const enc = new TextEncoder()
+  const key = await crypto.subtle.importKey(
+    'raw',
+    enc.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  )
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(payload))
+  return btoa(String.fromCharCode(...new Uint8Array(sig)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '')
+    .slice(0, 12)
 }
 
 /**
- * 토큰 만료 여부 확인
- * 토큰 형식: {prefix}_{timestamp}_{uuid}_{expiry}
+ * HMAC 서명 검증
+ * 토큰 형식: {prefix}_{ts}_{uuid}_{expiry}_{hmac12}
+ */
+async function verifyTokenSignature(token: string, secret: string): Promise<boolean> {
+  const parts = token.split('_')
+  if (parts.length !== 5) return false // 5-part HMAC 형식만 허용
+
+  const [prefix, ts, rand, expiry, sig] = parts
+  const payload = `${prefix}_${ts}_${rand}_${expiry}`
+  const expectedSig = await signPayload(payload, secret)
+
+  // Constant-time comparison (timing attack 방지)
+  if (sig.length !== expectedSig.length) return false
+  let diff = 0
+  for (let i = 0; i < sig.length; i++) {
+    diff |= sig.charCodeAt(i) ^ expectedSig.charCodeAt(i)
+  }
+  return diff === 0
+}
+
+/**
+ * 토큰 만료 여부 확인 (5-part HMAC 토큰 전용)
  */
 function isTokenExpired(token: string): boolean {
   const parts = token.split('_')
-  if (parts.length < 4) return false // 구형 토큰은 만료 체크 생략 (하위 호환)
+  if (parts.length !== 5) return true // 5-part HMAC 형식만 허용
   const expiry = parseInt(parts[3], 36)
-  if (isNaN(expiry)) return false
+  if (isNaN(expiry)) return true
   return Date.now() > expiry
 }
 
@@ -251,10 +286,11 @@ function normalizeOut(obj: any): CoachResponse {
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const token = getBearer(ctx.request)
   const clientIP = getClientIP(ctx.request)
+  const secret = ctx.env.TOKEN_SECRET || 'dev-secret-do-not-use-in-prod'
 
-  // 1. 토큰 유효성 검증
-  if (!isAllowed(token, ctx.env)) {
-    return unauthorized('PRO token required')
+  // 1. HMAC 서명 검증
+  if (!await verifyTokenSignature(token, secret)) {
+    return unauthorized('Invalid token signature')
   }
 
   // 2. 토큰 만료 검증

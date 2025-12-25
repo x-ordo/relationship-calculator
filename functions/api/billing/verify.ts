@@ -8,8 +8,8 @@ export interface Env {
   PORTONE_API_SECRET: string
   /** PRO 토큰 prefix */
   PRO_TOKEN_PREFIX: string
-  /** 허용된 PRO 토큰 목록 (쉼표 구분, coach.ts에서 검증용) */
-  PRO_TOKENS: string
+  /** HMAC 서명 시크릿 */
+  TOKEN_SECRET: string
   /** Cloudflare KV for issued tokens */
   TOKEN_KV?: KVNamespace
 }
@@ -36,14 +36,37 @@ function unauthorized(message: string) {
 }
 
 /**
- * 암호학적으로 안전한 토큰 생성
- * 형식: {prefix}_{timestamp_base36}_{uuid}_{expiry_base36}
+ * HMAC-SHA256 서명 생성
+ * @returns base64url 인코딩된 서명 (12자)
  */
-function issueToken(prefix: string, expiryDays: number) {
+async function signPayload(payload: string, secret: string): Promise<string> {
+  const enc = new TextEncoder()
+  const key = await crypto.subtle.importKey(
+    'raw',
+    enc.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  )
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(payload))
+  return btoa(String.fromCharCode(...new Uint8Array(sig)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '')
+    .slice(0, 12)
+}
+
+/**
+ * HMAC 서명된 토큰 생성
+ * 형식: {prefix}_{timestamp_base36}_{uuid}_{expiry_base36}_{hmac12}
+ */
+async function issueSignedToken(prefix: string, expiryDays: number, secret: string): Promise<string> {
   const rand = crypto.randomUUID().replace(/-/g, '').slice(0, 16)
   const ts = Date.now().toString(36)
   const expiry = (Date.now() + expiryDays * 86400000).toString(36)
-  return `${prefix}_${ts}_${rand}_${expiry}`
+  const payload = `${prefix}_${ts}_${rand}_${expiry}`
+  const sig = await signPayload(payload, secret)
+  return `${payload}_${sig}`
 }
 
 /**
@@ -117,10 +140,11 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       }
     }
 
-    // 5. PRO 토큰 발급
+    // 5. PRO 토큰 발급 (HMAC 서명)
     const expiryDays = productId === 'pro_yearly' ? 365 : 30
     const prefix = ctx.env.PRO_TOKEN_PREFIX || 'pro'
-    const token = issueToken(prefix, expiryDays)
+    const secret = ctx.env.TOKEN_SECRET || 'dev-secret-do-not-use-in-prod'
+    const token = await issueSignedToken(prefix, expiryDays, secret)
 
     // 6. 토큰 저장 (KV에 결제ID → 토큰 매핑)
     if (ctx.env.TOKEN_KV) {

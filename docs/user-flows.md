@@ -80,7 +80,7 @@
 ```
 
 **관련 이벤트**:
-- `SETTINGS_PATCH { timeValuePerHourWon }`
+- `SETTINGS_PATCH { hourlyRateWon }`
 - `PERSON_ADD { person }`
 - `ENTRY_ADD { entry }`
 - `SETTINGS_PATCH { onboardingCompleted, onboardingVersion }`
@@ -187,7 +187,7 @@
 **손실 계산 공식**:
 ```
 Cost = moneyWon
-     + (minutes / 60) × timeValuePerHourWon
+     + (minutes / 60) × hourlyRateWon
      + (boundaryHit ? 15,000 : 0)
      + (moodDelta < 0 ? |moodDelta| × 12,000 : 0)
      + (reciprocity ≤ 2 ? (3 - reciprocity) × 7,000 : 0)

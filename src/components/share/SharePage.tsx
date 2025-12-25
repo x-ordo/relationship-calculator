@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { AppState as DomainState } from '../../shared/storage/state'
 import type { AppEvent } from '../../state/events'
-import { buildReport } from '../../shared/domain/report'
+import { buildReport, calcReceiptLines } from '../../shared/domain/report'
 import { SHARE_CARD_COPY, renderTemplate } from '../../shared/copy/shareCardCopy'
 import { SHARE_CARD_LAYOUTS, LAYOUT_CATEGORIES, type LayoutId, type LayoutCategory } from '../../shared/ui/shareCardLayouts'
 import { exportShareCardPng } from '../../shared/utils/exportShareCard'
@@ -72,6 +72,12 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
   const headline = useMemo(() => renderTemplate(copy.headline, vars), [copy, vars])
   const sub = useMemo(() => renderTemplate(copy.sub, vars), [copy, vars])
   const footer = useMemo(() => renderTemplate(copy.footer, vars), [copy, vars])
+
+  // 영수증 레이아웃용 breakdown 라인
+  const receiptLines = useMemo(() => {
+    if (layout.category !== '영수증') return []
+    return calcReceiptLines(report, domain.settings.hourlyRateWon)
+  }, [layout.category, report, domain.settings.hourlyRateWon])
 
   const cardRef = useRef<HTMLDivElement>(null)
 
@@ -328,7 +334,37 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
                   {domain.settings.anonymizeOnShare ? anonymizeText(sub, aliasMap) : sub}
                 </div>
 
-                {layout.showBigNumber && (
+                {layout.category === '영수증' && receiptLines.length > 0 ? (
+                  <div style={{
+                    marginTop: 14,
+                    padding: '12px 14px',
+                    borderRadius: 8,
+                    border: `1px dashed ${layout.border}`,
+                    background: 'rgba(255,255,255,0.02)',
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                    fontSize: 13,
+                  }}>
+                    <div style={{ fontSize: 11, color: layout.sub, marginBottom: 8, letterSpacing: '0.5px' }}>
+                      ─────── 비용 명세 ───────
+                    </div>
+                    {receiptLines.map((line) => (
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        padding: '3px 0',
+                        borderTop: line.isSubtotal || line.isTotal ? `1px dashed ${layout.border}` : 'none',
+                        marginTop: line.isSubtotal || line.isTotal ? 6 : 0,
+                        paddingTop: line.isSubtotal || line.isTotal ? 6 : 3,
+                        fontWeight: line.isTotal ? 900 : 400,
+                        fontSize: line.isTotal ? 15 : 13,
+                        color: line.highlight ? layout.accent : layout.fg,
+                      }}>
+                        <span>{line.label}</span>
+                        <span>{line.amount >= 0 ? '-' : '+'}₩{Math.abs(line.amount).toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : layout.showBigNumber && (
                   <div style={{ marginTop: 18, padding: 14, borderRadius: 18, border: `1px solid ${layout.border}`, background: 'rgba(255,255,255,0.04)' }}>
                     <div style={{ fontSize: 12, color: layout.sub }}>총 손실</div>
                     <div style={{ fontSize: 34, fontWeight: 950, color: layout.brutal ? layout.accent : 'var(--danger)' }}>-₩{report.totals.netLossWon.toLocaleString()}</div>

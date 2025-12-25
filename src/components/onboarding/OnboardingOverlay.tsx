@@ -34,7 +34,7 @@ const HOURLY_PRESETS = [
 export function OnboardingOverlay({ domain, dispatch }: { domain: DomainState; dispatch: (e: AppEvent) => void }) {
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
-  const [hourlyRate, setHourlyRate] = useState(domain.settings.timeValuePerHourWon)
+  const [hourlyRate, setHourlyRate] = useState(domain.settings.hourlyRateWon)
   const [customRate, setCustomRate] = useState('')
   const people = domain.people
   const entries = domain.entries
@@ -111,6 +111,57 @@ export function OnboardingOverlay({ domain, dispatch }: { domain: DomainState; d
     for (const e of demoEntries) dispatch({ type: 'ENTRY_ADD', entry: e })
   }
 
+  // 극적인 데모 데이터 - 바이럴용
+  const seedDramaticDemo = () => {
+    if (domain.entries.some(e => (e.note || '').includes('[demo]'))) return
+
+    const [p0, p1] = ensureTwoPeople()
+    if (!p0) return
+
+    const date = todayYmd()
+    const dramaticEntries: Entry[] = [
+      {
+        id: uid('e'),
+        personId: p0.id,
+        date,
+        minutes: 180, // 3시간
+        moneyWon: 150000, // 15만원
+        moodDelta: -2,
+        reciprocity: 1,
+        boundaryHit: true,
+        note: '[demo] 갑자기 불려가서 3시간 대기. 밥값+술값까지 냄. 사과 없음.',
+      },
+      {
+        id: uid('e'),
+        personId: (p1?.id || p0.id),
+        date,
+        minutes: 30,
+        moneyWon: 0,
+        moodDelta: 2,
+        reciprocity: 5,
+        boundaryHit: false,
+        note: '[demo] 짧은 카페 미팅. 서로 정보 교환. 기분 좋았음.',
+      }
+    ]
+    for (const e of dramaticEntries) dispatch({ type: 'ENTRY_ADD', entry: e })
+  }
+
+  // 10초 체험: 극적인 데모 → 바로 공유 탭
+  const quickDemo = () => {
+    // 기본 시급 설정
+    if (!domain.settings.hourlyRateWon || domain.settings.hourlyRateWon <= 0) {
+      dispatch({ type: 'SETTINGS_PATCH', patch: { hourlyRateWon: 25000 } })
+    }
+    // A/B 자동 생성
+    ensureTwoPeople()
+    // 극적인 데모 기록
+    seedDramaticDemo()
+    // 온보딩 완료
+    completeOnboarding(dispatch)
+    // 공유 탭으로 이동
+    dispatch({ type: 'SET_TAB', tab: 'share' })
+  }
+
   const header = (title: string, sub: string) => (
     <div>
       <div class="h1" style={{ margin: 0 }}>{title}</div>
@@ -128,8 +179,8 @@ export function OnboardingOverlay({ domain, dispatch }: { domain: DomainState; d
 
   const skip = () => {
     // 기본 시급 설정 (설정 안 됐으면 평균값)
-    if (!domain.settings.timeValuePerHourWon || domain.settings.timeValuePerHourWon <= 0) {
-      dispatch({ type: 'SETTINGS_PATCH', patch: { timeValuePerHourWon: 25000 } })
+    if (!domain.settings.hourlyRateWon || domain.settings.hourlyRateWon <= 0) {
+      dispatch({ type: 'SETTINGS_PATCH', patch: { hourlyRateWon: 25000 } })
     }
     // 사람 2명 자동 생성
     ensureTwoPeople()
@@ -140,7 +191,7 @@ export function OnboardingOverlay({ domain, dispatch }: { domain: DomainState; d
   }
 
   const saveHourlyRate = () => {
-    dispatch({ type: 'SETTINGS_PATCH', patch: { timeValuePerHourWon: hourlyRate } })
+    dispatch({ type: 'SETTINGS_PATCH', patch: { hourlyRateWon: hourlyRate } })
   }
 
   const next = () => {
@@ -166,6 +217,20 @@ export function OnboardingOverlay({ domain, dispatch }: { domain: DomainState; d
         {step === 0 && (
           <div style={{ marginTop: 14 }}>
             {header('감정 빼고, 손익만 정리한다.', '딱 1분만. 사람 2명 + 기록 2개 만들면 "공유 카드"까지 바로 나온다.')}
+
+            {/* 10초 체험 CTA */}
+            <div class="callout" style={{ marginTop: 14, background: 'rgba(124, 58, 237, 0.15)', border: '1px solid rgba(124, 58, 237, 0.3)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                <div>
+                  <div style={{ fontWeight: 900, fontSize: 16 }}>⚡ 10초 체험</div>
+                  <div class="hint" style={{ marginTop: 4 }}>샘플 데이터로 공유 카드까지 바로 확인</div>
+                </div>
+                <button class="btn primary" style={{ whiteSpace: 'nowrap' }} onClick={quickDemo}>
+                  바로 공유 카드 보기
+                </button>
+              </div>
+            </div>
+
             <div class="card" style={{ marginTop: 14 }}>
               <div class="h2">규칙</div>
               <ul class="obList">
@@ -175,7 +240,8 @@ export function OnboardingOverlay({ domain, dispatch }: { domain: DomainState; d
               </ul>
             </div>
 
-            <div class="row" style={{ justifyContent: 'flex-end', marginTop: 14 }}>
+            <div class="row" style={{ justifyContent: 'space-between', marginTop: 14 }}>
+              <div class="hint">또는 직접 설정하면서 시작 →</div>
               <button class="btn primary" onClick={next}>시작</button>
             </div>
           </div>

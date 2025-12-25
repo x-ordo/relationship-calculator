@@ -20,7 +20,7 @@ export function EditEntryModal({ entry, domain, dispatch, onClose }: Props) {
   const [note, setNote] = useState(entry.note || '')
 
   const person = useMemo(() => domain.people.find(p => p.id === entry.personId), [domain.people, entry.personId])
-  const hourlyRate = domain.settings.timeValuePerHourWon
+  const hourlyRate = domain.settings.hourlyRateWon
   const timeCostWon = useMemo(() => Math.round((minutes / 60) * hourlyRate), [minutes, hourlyRate])
 
   const handleSave = () => {

@@ -1,12 +1,12 @@
 import { json, badRequest, unauthorized } from '../../utils/response'
-import { getBearer, getClientIP, isTokenExpired } from '../../utils/token'
+import { getBearer, getClientIP, verifyTokenSignature, isSignedTokenExpired } from '../../utils/token'
 
 export interface Env {
   LLM_BASE_URL: string
   LLM_API_KEY: string
   LLM_MODEL: string
-  /** comma-separated tokens */
-  PRO_TOKENS: string
+  /** HMAC 서명 시크릿 */
+  TOKEN_SECRET: string
   /** Cloudflare KV for rate limiting */
   RATE_LIMIT_KV?: KVNamespace
 }
@@ -29,12 +29,6 @@ type CoachResponse = {
   actions: string[]
   grade: 'GUILTY' | 'WARNING' | 'PROBATION' | 'INNOCENT'
   disclaimer: string
-}
-
-function isAllowed(token: string, env: Env) {
-  const allow = (env.PRO_TOKENS || '').split(',').map(s => s.trim()).filter(Boolean)
-  if (allow.length === 0) return true // MVP: allow-all if env not set
-  return allow.includes(token)
 }
 
 /**
@@ -209,14 +203,15 @@ function normalizeOut(obj: any): CoachResponse {
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const token = getBearer(ctx.request)
   const clientIP = getClientIP(ctx.request)
+  const secret = ctx.env.TOKEN_SECRET || 'dev-secret-do-not-use-in-prod'
 
-  // 1. 토큰 유효성 검증
-  if (!isAllowed(token, ctx.env)) {
-    return unauthorized('PRO token required')
+  // 1. HMAC 서명 검증
+  if (!await verifyTokenSignature(token, secret)) {
+    return unauthorized('Invalid token signature')
   }
 
-  // 2. 토큰 만료 검증 (구형 토큰은 만료 체크 생략 - 하위 호환)
-  if (isTokenExpired(token, true)) {
+  // 2. 토큰 만료 검증
+  if (isSignedTokenExpired(token)) {
     return unauthorized('토큰이 만료되었습니다. PRO를 갱신해주세요.')
   }
 

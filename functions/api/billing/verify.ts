@@ -4,15 +4,15 @@
  */
 
 import { json, badRequest, serverError } from '../../utils/response'
-import { issueToken } from '../../utils/token'
+import { issueSignedToken } from '../../utils/token'
 
 export interface Env {
   /** PortOne V2 API Secret */
   PORTONE_API_SECRET: string
   /** PRO 토큰 prefix */
   PRO_TOKEN_PREFIX: string
-  /** 허용된 PRO 토큰 목록 (쉼표 구분, coach.ts에서 검증용) */
-  PRO_TOKENS: string
+  /** HMAC 서명 시크릿 */
+  TOKEN_SECRET: string
   /** Cloudflare KV for issued tokens */
   TOKEN_KV?: KVNamespace
 }
@@ -94,10 +94,11 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       }
     }
 
-    // 5. PRO 토큰 발급
+    // 5. PRO 토큰 발급 (HMAC 서명)
     const expiryDays = productId === 'pro_yearly' ? 365 : 30
     const prefix = ctx.env.PRO_TOKEN_PREFIX || 'pro'
-    const token = issueToken(prefix, expiryDays)
+    const secret = ctx.env.TOKEN_SECRET || 'dev-secret-do-not-use-in-prod'
+    const token = await issueSignedToken(prefix, expiryDays, secret)
 
     // 6. 토큰 저장 (KV에 결제ID → 토큰 매핑)
     if (ctx.env.TOKEN_KV) {

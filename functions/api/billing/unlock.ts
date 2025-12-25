@@ -1,10 +1,10 @@
 import { json, badRequest, forbidden } from '../../utils/response'
-import { issueToken } from '../../utils/token'
+import { issueSignedToken } from '../../utils/token'
 
 export interface Env {
   PRO_UNLOCK_CODES: string
   PRO_TOKEN_PREFIX: string
-  PRO_TOKENS: string
+  TOKEN_SECRET: string
 }
 
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
@@ -28,8 +28,9 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     return forbidden('invalid code')
   }
 
-  // MVP: 토큰 발급만. (진짜 구독/결제는 웹훅 + DB로 확장)
+  // HMAC 서명된 토큰 발급
   const prefix = ctx.env.PRO_TOKEN_PREFIX || 'pro'
-  const token = issueToken(prefix)
+  const secret = ctx.env.TOKEN_SECRET || 'dev-secret-do-not-use-in-prod'
+  const token = await issueSignedToken(prefix, 30, secret)
   return json({ token })
 }

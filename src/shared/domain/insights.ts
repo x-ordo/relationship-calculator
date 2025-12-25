@@ -76,7 +76,7 @@ export function generateInsights(state: AppState): Insight[] {
 
   // 3. 시간 투자 체크
   const totalMinutes = weekEntries.reduce((sum, e) => sum + e.minutes, 0)
-  const hourlyRate = state.settings.timeValuePerHourWon
+  const hourlyRate = state.settings.hourlyRateWon
   const timeCost = Math.round((totalMinutes / 60) * hourlyRate)
   if (totalMinutes >= 600) { // 10시간 이상
     insights.push({

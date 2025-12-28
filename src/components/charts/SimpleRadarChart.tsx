@@ -1,4 +1,4 @@
-import { useMemo } from 'preact/hooks'
+import { useMemo } from 'react'
 
 export interface RadarDataPoint {
   label: string

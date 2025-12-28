@@ -1,5 +1,5 @@
-/** @jsxImportSource preact */
-import { useMemo } from 'preact/hooks'
+import { useMemo } from 'react'
+import { Button, Badge, Dialog, DialogSurface, DialogBody, Card } from '@fluentui/react-components'
 import type { AppState as DomainState, Entry, Person } from '../../shared/storage/state'
 import type { AppEvent } from '../../state/events'
 import { buildReport, causeLabel, type PersonAggregate } from '../../shared/domain/report'
@@ -93,166 +93,168 @@ export function PersonDetailPage({ domain, person, dispatch, onClose }: Props) {
   const categoryLabel = person.category === 'work' ? '직장' : person.category === 'family' ? '가족' : '개인'
 
   return (
-    <div class="modalOverlay" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
-      <div class="modal" style={{ maxWidth: 640 }}>
-        {/* Header */}
-        <div class="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <div class="h1">{person.name}</div>
-            <div class="row" style={{ gap: 8, marginTop: 4 }}>
-              <span class="pill">{categoryLabel}</span>
-              {person.isClient && <span class="pill">클라이언트</span>}
-              <span class="hint">등록일: {person.createdAt.slice(0, 10)}</span>
+    <Dialog open onOpenChange={(_, data) => !data.open && onClose()}>
+      <DialogSurface className="modal" style={{ maxWidth: 640 }}>
+        <DialogBody>
+          {/* Header */}
+          <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <div className="h1">{person.name}</div>
+              <div className="row" style={{ gap: 8, marginTop: 4 }}>
+                <span className="pill">{categoryLabel}</span>
+                {person.isClient && <span className="pill">클라이언트</span>}
+                <span className="hint">등록일: {person.createdAt.slice(0, 10)}</span>
+              </div>
             </div>
+            <Button appearance="subtle" onClick={onClose}>닫기</Button>
           </div>
-          <button class="btn subtle" onClick={onClose}>닫기</button>
-        </div>
 
-        {/* Stats Summary */}
-        {personStats ? (
-          <div class="stats" style={{ marginTop: 16, gridTemplateColumns: 'repeat(2, 1fr)' }}>
-            <div class="stat">
-              <div class="hint">총 기록</div>
-              <div class="big">{personStats.entries}건</div>
-            </div>
-            <div class="stat">
-              <div class="hint">총 시간</div>
-              <div class="big">{Math.round(personStats.minutes / 60)}시간</div>
-            </div>
-            <div class="stat">
-              <div class="hint">순이익</div>
-              <div class={`big ${personStats.netWon >= 0 ? 'ok' : 'danger'}`}>
-                {personStats.netWon >= 0 ? '+' : ''}₩{personStats.netWon.toLocaleString()}
+          {/* Stats Summary */}
+          {personStats ? (
+            <div className="stats" style={{ marginTop: 16, gridTemplateColumns: 'repeat(2, 1fr)' }}>
+              <div className="stat">
+                <div className="hint">총 기록</div>
+                <div className="big">{personStats.entries}건</div>
               </div>
-            </div>
-            <div class="stat">
-              <div class="hint">ROI</div>
-              <div class={`big ${personStats.roiPct >= 0 ? 'ok' : 'danger'}`}>
-                {personStats.roiPct >= 0 ? '+' : ''}{personStats.roiPct}%
+              <div className="stat">
+                <div className="hint">총 시간</div>
+                <div className="big">{Math.round(personStats.minutes / 60)}시간</div>
               </div>
-            </div>
-          </div>
-        ) : (
-          <div class="callout" style={{ marginTop: 16 }}>
-            <div class="hint">아직 기록이 없습니다.</div>
-          </div>
-        )}
-
-        {/* Key Indicators */}
-        {personStats && (
-          <div class="card" style={{ marginTop: 16 }}>
-            <div class="h2">주요 지표</div>
-            <div class="list" style={{ marginTop: 8, gap: 6 }}>
-              <div class="row" style={{ justifyContent: 'space-between' }}>
-                <span>평균 상호성</span>
-                <span class={personStats.avgReciprocity >= 3 ? 'ok' : 'danger'}>
-                  {personStats.avgReciprocity}/5
-                </span>
-              </div>
-              <div class="row" style={{ justifyContent: 'space-between' }}>
-                <span>평균 기분 변화</span>
-                <span class={personStats.avgMoodDelta >= 0 ? 'ok' : 'danger'}>
-                  {personStats.avgMoodDelta >= 0 ? '+' : ''}{personStats.avgMoodDelta}
-                </span>
-              </div>
-              <div class="row" style={{ justifyContent: 'space-between' }}>
-                <span>경계 침해</span>
-                <span class={personStats.boundaryHits === 0 ? 'ok' : 'danger'}>
-                  {personStats.boundaryHits}회
-                </span>
-              </div>
-              <div class="row" style={{ justifyContent: 'space-between' }}>
-                <span>주요 비용 원인</span>
-                <span class="hint">{causeLabel(personStats.topCause)}</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Weekly Trend */}
-        {weeklyTrends.some(w => w.entries > 0) && (
-          <div class="card" style={{ marginTop: 16 }}>
-            <div class="h2">주간 추이</div>
-            <div class="grid" style={{ marginTop: 8, gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-              {weeklyTrends.map(w => (
-                <div key={w.weekLabel} style={{ textAlign: 'center', padding: 8, background: 'var(--colorNeutralBackground2)', borderRadius: 'var(--borderRadiusMedium)' }}>
-                  <div class="hint" style={{ fontSize: 'var(--fontSizeBase100)' }}>{w.weekLabel}</div>
-                  {w.entries > 0 ? (
-                    <>
-                      <div style={{ fontWeight: 700, color: w.netWon >= 0 ? 'var(--colorStatusSuccessForeground1)' : 'var(--colorStatusDangerForeground1)' }}>
-                        {w.netWon >= 0 ? '+' : ''}{Math.round(w.netWon / 1000)}k
-                      </div>
-                      <div class="hint">{w.entries}건</div>
-                    </>
-                  ) : (
-                    <div class="hint">-</div>
-                  )}
+              <div className="stat">
+                <div className="hint">순이익</div>
+                <div className={`big ${personStats.netWon >= 0 ? 'ok' : 'danger'}`}>
+                  {personStats.netWon >= 0 ? '+' : ''}₩{personStats.netWon.toLocaleString()}
                 </div>
-              ))}
+              </div>
+              <div className="stat">
+                <div className="hint">ROI</div>
+                <div className={`big ${personStats.roiPct >= 0 ? 'ok' : 'danger'}`}>
+                  {personStats.roiPct >= 0 ? '+' : ''}{personStats.roiPct}%
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Recent Entries */}
-        <div style={{ marginTop: 16 }}>
-          <div class="row" style={{ justifyContent: 'space-between' }}>
-            <div class="h2">최근 기록</div>
-            <span class="hint">{personEntries.length}건</span>
-          </div>
-          {personEntries.length === 0 ? (
-            <div class="hint" style={{ marginTop: 8 }}>기록이 없습니다.</div>
           ) : (
-            <div class="list" style={{ marginTop: 8, maxHeight: 240, overflow: 'auto' }}>
-              {personEntries.slice(0, 10).map(e => (
-                <div key={e.id} class="listItem" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
-                  <div class="row" style={{ justifyContent: 'space-between' }}>
-                    <span class="hint">{e.date}</span>
-                    <span>{MOOD_EMOJI[e.moodDelta] || '😐'}</span>
-                  </div>
-                  <div class="row" style={{ gap: 12, flexWrap: 'wrap' }}>
-                    <span>{e.minutes}분</span>
-                    {e.moneyWon > 0 && <span>₩{e.moneyWon.toLocaleString()}</span>}
-                    <span>상호성 {e.reciprocity}/5</span>
-                    {e.boundaryHit && <span class="badge danger">경계 침해</span>}
-                  </div>
-                  {e.note && (
-                    <div class="note" style={{ marginTop: 4 }}>{e.note}</div>
-                  )}
-                </div>
-              ))}
-              {personEntries.length > 10 && (
-                <div class="hint" style={{ textAlign: 'center', padding: 8 }}>
-                  +{personEntries.length - 10}건 더 있음
-                </div>
-              )}
+            <div className="callout" style={{ marginTop: 16 }}>
+              <div className="hint">아직 기록이 없습니다.</div>
             </div>
           )}
-        </div>
 
-        {/* Actions */}
-        <div class="row" style={{ marginTop: 16, gap: 8 }}>
-          <button
-            class="btn primary"
-            onClick={() => {
-              // Close modal - user can use QuickLogBar on dashboard
-              onClose()
-            }}
-          >
-            닫기
-          </button>
-          <button
-            class="btn subtle"
-            onClick={() => {
-              if (confirm(`"${person.name}" 님을 삭제하시겠습니까?\n\n관련 기록도 모두 삭제됩니다.`)) {
-                dispatch({ type: 'PERSON_DELETE', personId: person.id })
+          {/* Key Indicators */}
+          {personStats && (
+            <Card className="card" style={{ marginTop: 16 }}>
+              <div className="h2">주요 지표</div>
+              <div className="list" style={{ marginTop: 8, gap: 6 }}>
+                <div className="row" style={{ justifyContent: 'space-between' }}>
+                  <span>평균 상호성</span>
+                  <span className={personStats.avgReciprocity >= 3 ? 'ok' : 'danger'}>
+                    {personStats.avgReciprocity}/5
+                  </span>
+                </div>
+                <div className="row" style={{ justifyContent: 'space-between' }}>
+                  <span>평균 기분 변화</span>
+                  <span className={personStats.avgMoodDelta >= 0 ? 'ok' : 'danger'}>
+                    {personStats.avgMoodDelta >= 0 ? '+' : ''}{personStats.avgMoodDelta}
+                  </span>
+                </div>
+                <div className="row" style={{ justifyContent: 'space-between' }}>
+                  <span>경계 침해</span>
+                  <span className={personStats.boundaryHits === 0 ? 'ok' : 'danger'}>
+                    {personStats.boundaryHits}회
+                  </span>
+                </div>
+                <div className="row" style={{ justifyContent: 'space-between' }}>
+                  <span>주요 비용 원인</span>
+                  <span className="hint">{causeLabel(personStats.topCause)}</span>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Weekly Trend */}
+          {weeklyTrends.some(w => w.entries > 0) && (
+            <Card className="card" style={{ marginTop: 16 }}>
+              <div className="h2">주간 추이</div>
+              <div className="grid" style={{ marginTop: 8, gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                {weeklyTrends.map(w => (
+                  <div key={w.weekLabel} style={{ textAlign: 'center', padding: 8, background: 'var(--colorNeutralBackground2)', borderRadius: 'var(--borderRadiusMedium)' }}>
+                    <div className="hint" style={{ fontSize: 'var(--fontSizeBase100)' }}>{w.weekLabel}</div>
+                    {w.entries > 0 ? (
+                      <>
+                        <div style={{ fontWeight: 700, color: w.netWon >= 0 ? 'var(--colorStatusSuccessForeground1)' : 'var(--colorStatusDangerForeground1)' }}>
+                          {w.netWon >= 0 ? '+' : ''}{Math.round(w.netWon / 1000)}k
+                        </div>
+                        <div className="hint">{w.entries}건</div>
+                      </>
+                    ) : (
+                      <div className="hint">-</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* Recent Entries */}
+          <div style={{ marginTop: 16 }}>
+            <div className="row" style={{ justifyContent: 'space-between' }}>
+              <div className="h2">최근 기록</div>
+              <span className="hint">{personEntries.length}건</span>
+            </div>
+            {personEntries.length === 0 ? (
+              <div className="hint" style={{ marginTop: 8 }}>기록이 없습니다.</div>
+            ) : (
+              <div className="list" style={{ marginTop: 8, maxHeight: 240, overflow: 'auto' }}>
+                {personEntries.slice(0, 10).map(e => (
+                  <div key={e.id} className="listItem" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
+                    <div className="row" style={{ justifyContent: 'space-between' }}>
+                      <span className="hint">{e.date}</span>
+                      <span>{MOOD_EMOJI[e.moodDelta] || '😐'}</span>
+                    </div>
+                    <div className="row" style={{ gap: 12, flexWrap: 'wrap' }}>
+                      <span>{e.minutes}분</span>
+                      {e.moneyWon > 0 && <span>₩{e.moneyWon.toLocaleString()}</span>}
+                      <span>상호성 {e.reciprocity}/5</span>
+                      {e.boundaryHit && <Badge color="danger">경계 침해</Badge>}
+                    </div>
+                    {e.note && (
+                      <div className="note" style={{ marginTop: 4 }}>{e.note}</div>
+                    )}
+                  </div>
+                ))}
+                {personEntries.length > 10 && (
+                  <div className="hint" style={{ textAlign: 'center', padding: 8 }}>
+                    +{personEntries.length - 10}건 더 있음
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="row" style={{ marginTop: 16, gap: 8 }}>
+            <Button
+              appearance="primary"
+              onClick={() => {
+                // Close modal - user can use QuickLogBar on dashboard
                 onClose()
-              }
-            }}
-          >
-            삭제
-          </button>
-        </div>
-      </div>
-    </div>
+              }}
+            >
+              닫기
+            </Button>
+            <Button
+              appearance="subtle"
+              onClick={() => {
+                if (confirm(`"${person.name}" 님을 삭제하시겠습니까?\n\n관련 기록도 모두 삭제됩니다.`)) {
+                  dispatch({ type: 'PERSON_DELETE', personId: person.id })
+                  onClose()
+                }
+              }}
+            >
+              삭제
+            </Button>
+          </div>
+        </DialogBody>
+      </DialogSurface>
+    </Dialog>
   )
 }

@@ -1,5 +1,5 @@
-/** @jsxImportSource preact */
-import { useRef, useState } from 'preact/hooks'
+import { useRef, useState, type ChangeEvent } from 'react'
+import { Button, Card } from '@fluentui/react-components'
 import type { AppState as DomainState } from '../../shared/storage/state'
 import type { AppEvent } from '../../state/events'
 import { exportToJson, exportToCsv, importFromJson, downloadFile } from '../../shared/utils/backup'
@@ -36,8 +36,8 @@ export function BackupRestoreCard({ domain, dispatch }: Props) {
     fileInputRef.current?.click()
   }
 
-  const handleFileChange = async (e: Event) => {
-    const file = (e.target as HTMLInputElement).files?.[0]
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
     if (!file) return
 
     try {
@@ -67,14 +67,14 @@ export function BackupRestoreCard({ domain, dispatch }: Props) {
   }
 
   return (
-    <div class="card" style={{ marginTop: 14 }}>
-      <div class="h2">데이터 백업/복원</div>
-      <div class="hint">JSON으로 전체 백업하거나, CSV로 기록만 내보낼 수 있습니다.</div>
+    <Card className="card" style={{ marginTop: 14 }}>
+      <div className="h2">데이터 백업/복원</div>
+      <div className="hint">JSON으로 전체 백업하거나, CSV로 기록만 내보낼 수 있습니다.</div>
 
-      <div class="row" style={{ marginTop: 12, gap: 8 }}>
-        <button class="btn primary" onClick={handleExportJson}>JSON 백업</button>
-        <button class="btn" onClick={handleExportCsv}>CSV 내보내기</button>
-        <button class="btn" onClick={handleImportClick}>JSON 복원</button>
+      <div className="row" style={{ marginTop: 12, gap: 8 }}>
+        <Button appearance="primary" onClick={handleExportJson}>JSON 백업</Button>
+        <Button onClick={handleExportCsv}>CSV 내보내기</Button>
+        <Button onClick={handleImportClick}>JSON 복원</Button>
         <input
           ref={fileInputRef}
           type="file"
@@ -85,14 +85,14 @@ export function BackupRestoreCard({ domain, dispatch }: Props) {
       </div>
 
       {status !== 'idle' && (
-        <div class={`callout ${status === 'success' ? '' : 'danger'}`} style={{ marginTop: 10, padding: '8px 12px' }}>
+        <div className={`callout ${status === 'success' ? '' : 'danger'}`} style={{ marginTop: 10, padding: '8px 12px' }}>
           {message}
         </div>
       )}
 
-      <div class="hint" style={{ marginTop: 10 }}>
+      <div className="hint" style={{ marginTop: 10 }}>
         현재: {domain.people.length}명, {domain.entries.length}개 기록
       </div>
-    </div>
+    </Card>
   )
 }

@@ -1,5 +1,5 @@
-/** @jsxImportSource preact */
-import { useEffect } from 'preact/hooks'
+import { useEffect } from 'react'
+import { Button } from '@fluentui/react-components'
 import { useSpeechRecognition } from '../../shared/hooks/useSpeechRecognition'
 
 type Props = {
@@ -19,7 +19,6 @@ export function VoiceInputButton({ onTranscript, disabled }: Props) {
     reset,
   } = useSpeechRecognition()
 
-  // Send transcript to parent when recording stops
   useEffect(() => {
     if (state === 'idle' && transcript) {
       onTranscript(transcript)
@@ -28,16 +27,15 @@ export function VoiceInputButton({ onTranscript, disabled }: Props) {
   }, [state, transcript, onTranscript, reset])
 
   if (!isSupported) {
-    return null // Hide button if not supported
+    return null
   }
 
   const isListening = state === 'listening'
 
   return (
-    <div class="voice-input-container" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-      <button
-        type="button"
-        class={`btn ${isListening ? 'primary' : 'subtle'}`}
+    <div className="voice-input-container" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+      <Button
+        appearance={isListening ? 'primary' : 'subtle'}
         onClick={() => {
           if (isListening) {
             stop()
@@ -54,18 +52,16 @@ export function VoiceInputButton({ onTranscript, disabled }: Props) {
         }}
       >
         {isListening ? '🔴' : '🎤'}
-      </button>
+      </Button>
 
-      {/* Interim transcript display */}
       {isListening && interimTranscript && (
-        <span class="hint" style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span className="hint" style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {interimTranscript}...
         </span>
       )}
 
-      {/* Error display */}
       {error && (
-        <span class="hint" style={{ color: 'var(--colorStatusDangerForeground1)' }}>
+        <span className="hint" style={{ color: 'var(--colorStatusDangerForeground1)' }}>
           {error}
         </span>
       )}

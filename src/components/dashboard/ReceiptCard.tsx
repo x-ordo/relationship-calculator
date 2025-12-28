@@ -1,5 +1,4 @@
-/** @jsxImportSource preact */
-import { useMemo } from 'preact/hooks'
+import { useMemo } from 'react'
 import type { AppState as DomainState } from '../../shared/storage/state'
 import { buildReport, calcReceiptLines } from '../../shared/domain/report'
 
@@ -62,59 +61,59 @@ export function ReceiptCard({ domain, personId }: Props) {
   const mins = Math.round(totalMinutes % 60)
 
   return (
-    <div class="receipt-card">
+    <div className="receipt-card">
       {/* 영수증 헤더 */}
-      <div class="receipt-header">
-        <div class="receipt-store">관계 감사 리포트</div>
-        <div class="receipt-subtitle">Relationship Audit</div>
+      <div className="receipt-header">
+        <div className="receipt-store">관계 감사 리포트</div>
+        <div className="receipt-subtitle">Relationship Audit</div>
       </div>
 
-      <div class="receipt-divider dashed" />
+      <div className="receipt-divider dashed" />
 
       {/* 메타 정보 */}
-      <div class="receipt-meta">
-        <div class="receipt-row">
+      <div className="receipt-meta">
+        <div className="receipt-row">
           <span>영수증 번호</span>
           <span>{receiptNo}</span>
         </div>
-        <div class="receipt-row">
+        <div className="receipt-row">
           <span>기간</span>
           <span>{dateRange}</span>
         </div>
-        <div class="receipt-row">
+        <div className="receipt-row">
           <span>발행일시</span>
           <span>{formatDate(new Date())} {formatTime()}</span>
         </div>
-        <div class="receipt-row">
+        <div className="receipt-row">
           <span>기록 건수</span>
           <span>{report.totals.entries}건</span>
         </div>
-        <div class="receipt-row">
+        <div className="receipt-row">
           <span>총 시간</span>
           <span>{hours}시간 {mins}분</span>
         </div>
       </div>
 
-      <div class="receipt-divider solid" />
+      <div className="receipt-divider solid" />
 
       {!hasData ? (
-        <div class="receipt-empty">
-          <div class="receipt-empty-title">기록 없음</div>
-          <div class="receipt-empty-hint">이번 주 기록이 없습니다.</div>
-          <div class="receipt-empty-hint">오늘 10초 기록 1건만 남겨보세요.</div>
+        <div className="receipt-empty">
+          <div className="receipt-empty-title">기록 없음</div>
+          <div className="receipt-empty-hint">이번 주 기록이 없습니다.</div>
+          <div className="receipt-empty-hint">오늘 10초 기록 1건만 남겨보세요.</div>
         </div>
       ) : (
         <>
           {/* 비용 항목 */}
-          <div class="receipt-items">
-            <div class="receipt-row header">
+          <div className="receipt-items">
+            <div className="receipt-row header">
               <span>항목</span>
               <span>금액</span>
             </div>
             {lines.map((line, i) => (
               <div
                 key={i}
-                class={`receipt-row ${line.isSubtotal ? 'subtotal' : ''} ${line.isTotal ? 'total' : ''} ${line.highlight ? 'highlight' : ''}`}
+                className={`receipt-row ${line.isSubtotal ? 'subtotal' : ''} ${line.isTotal ? 'total' : ''} ${line.highlight ? 'highlight' : ''}`}
               >
                 <span>{line.label}</span>
                 <span>{line.amount < 0 ? '' : '-'}₩{Math.abs(line.amount).toLocaleString()}</span>
@@ -122,30 +121,30 @@ export function ReceiptCard({ domain, personId }: Props) {
             ))}
           </div>
 
-          <div class="receipt-divider dashed" />
+          <div className="receipt-divider dashed" />
 
           {/* 손해 원인 */}
-          <div class="receipt-cause">
-            <div class="receipt-row">
+          <div className="receipt-cause">
+            <div className="receipt-row">
               <span>손해 1위</span>
-              <span class="accent">{report.topPersonLabel}</span>
+              <span className="accent">{report.topPersonLabel}</span>
             </div>
-            <div class="receipt-row">
+            <div className="receipt-row">
               <span>주요 원인</span>
-              <span class="accent">{report.topCauseLabel}</span>
+              <span className="accent">{report.topCauseLabel}</span>
             </div>
           </div>
 
-          <div class="receipt-divider solid" />
+          <div className="receipt-divider solid" />
 
           {/* 바이럴 푸터 */}
-          <div class="receipt-footer">
-            <div class="receipt-verdict">{viralFooter}</div>
-            <div class="receipt-brand">relationship-audit.app</div>
+          <div className="receipt-footer">
+            <div className="receipt-verdict">{viralFooter}</div>
+            <div className="receipt-brand">relationship-audit.app</div>
           </div>
 
           {/* 영수증 하단 패턴 */}
-          <div class="receipt-tear" />
+          <div className="receipt-tear" />
         </>
       )}
     </div>

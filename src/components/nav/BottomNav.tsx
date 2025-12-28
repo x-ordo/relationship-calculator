@@ -1,4 +1,3 @@
-/** @jsxImportSource preact */
 import type { Tab } from '../../state/ui'
 
 type Props = {
@@ -15,15 +14,15 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
 
 export function BottomNav({ tab, onTabChange }: Props) {
   return (
-    <nav class="bottom-nav">
+    <nav className="bottom-nav">
       {TABS.map(t => (
         <button
           key={t.id}
-          class={`bottom-nav-item ${tab === t.id ? 'active' : ''}`}
+          className={`bottom-nav-item ${tab === t.id ? 'active' : ''}`}
           onClick={() => onTabChange(t.id)}
         >
-          <span class="bottom-nav-icon">{t.icon}</span>
-          <span class="bottom-nav-label">{t.label}</span>
+          <span className="bottom-nav-icon">{t.icon}</span>
+          <span className="bottom-nav-label">{t.label}</span>
         </button>
       ))}
     </nav>

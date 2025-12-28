@@ -1,19 +1,13 @@
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useState } from 'react'
+import { Spinner } from '@fluentui/react-components'
 import { LOADING_MESSAGES, COACH_LOADING_MESSAGES } from '../../shared/copy/loadingMessages'
 
 interface LoadingSpinnerProps {
-  /** 사용할 메시지 타입 */
   variant?: 'default' | 'coach'
-  /** 스피너 색상 */
   color?: 'brand' | 'gold'
-  /** 메시지 변경 간격 (ms) */
   interval?: number
 }
 
-/**
- * 동적 메시지가 순환하는 로딩 스피너
- * relationship-audit 스타일 흡수
- */
 export function LoadingSpinner({
   variant = 'default',
   color = 'brand',
@@ -37,7 +31,10 @@ export function LoadingSpinner({
 
   return (
     <div className="loading-container">
-      <div className={`loading-spinner ${color === 'gold' ? 'gold' : ''}`} />
+      <Spinner
+        size="large"
+        style={{ color: color === 'gold' ? 'var(--colorAuditGold)' : undefined }}
+      />
       <p className={`loading-message ${fade ? 'fade' : ''}`}>
         {messages[messageIndex]}
       </p>

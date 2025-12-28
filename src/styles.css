@@ -371,36 +371,13 @@ a:hover { color: var(--colorBrandForeground2); }
 }
 
 /* ========================================
-   Tabs
+   Tabs (Legacy - Fluent UI <TabList>/<Tab> now used)
+   Kept for responsive layout references
    ======================================== */
 .tabs {
   display: flex;
   gap: var(--spacingXS);
   flex-wrap: wrap;
-}
-
-.tab {
-  padding: var(--spacingS) var(--spacingM);
-  border-radius: var(--borderRadiusMedium);
-  border: var(--strokeWidthThin) solid transparent;
-  background: var(--colorSubtleBackground);
-  color: var(--colorNeutralForeground2);
-  cursor: pointer;
-  font-weight: var(--fontWeightSemibold);
-  font-size: var(--fontSizeBase300);
-  transition: all var(--durationFast) var(--curveEasyEase);
-}
-.tab:hover {
-  background: var(--colorSubtleBackgroundHover);
-  color: var(--colorNeutralForeground1);
-}
-.tab:active {
-  background: var(--colorSubtleBackgroundPressed);
-}
-.tab.active {
-  border-color: var(--colorBrandStroke1);
-  background: rgba(40,153,245,0.12);
-  color: var(--colorBrandForeground1);
 }
 
 /* ========================================
@@ -501,105 +478,12 @@ a:hover { color: var(--colorBrandForeground2); }
   flex-shrink: 1;
 }
 
-.textarea {
-  width: 100%;
-  min-height: 120px;
-  resize: vertical;
-  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
-  background: var(--colorNeutralBackground2);
-  color: var(--colorNeutralForeground1);
-  padding: var(--spacingS) var(--spacingM);
-  border-radius: var(--borderRadiusMedium);
-  font-family: var(--fontFamilyBase);
-  font-size: var(--fontSizeBase300);
-  line-height: var(--lineHeightBase300);
-  transition: border-color var(--durationFast) var(--curveEasyEase);
-}
-.textarea::placeholder { color: var(--colorNeutralForeground4); }
-.textarea:hover { border-color: var(--colorNeutralStroke1Hover); }
-.textarea:focus {
-  border-color: var(--colorBrandStroke1);
-  border-width: var(--strokeWidthThick);
-  padding: calc(var(--spacingS) - 1px) calc(var(--spacingM) - 1px);
-  outline: none;
-}
+/* .textarea - Replaced by Fluent UI <Textarea> */
 
 /* ========================================
-   Button
+   Button (Legacy - Fluent UI <Button> now used)
+   Kept for fallback/non-Fluent contexts
    ======================================== */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacingXS);
-  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
-  background: var(--colorNeutralBackground2);
-  color: var(--colorNeutralForeground1);
-  padding: var(--spacingSNudge) var(--spacingM);
-  min-height: 32px;
-  border-radius: var(--borderRadiusMedium);
-  cursor: pointer;
-  font-family: var(--fontFamilyBase);
-  font-weight: var(--fontWeightSemibold);
-  font-size: var(--fontSizeBase300);
-  line-height: 1;
-  text-decoration: none;
-  user-select: none;
-  transition: background var(--durationFast) var(--curveEasyEase),
-              border-color var(--durationFast) var(--curveEasyEase),
-              color var(--durationFast) var(--curveEasyEase),
-              transform var(--durationFaster) var(--curveEasyEase);
-}
-.btn:hover {
-  background: var(--colorNeutralBackground1Hover);
-  border-color: var(--colorNeutralStroke1Hover);
-}
-.btn:active {
-  background: var(--colorNeutralBackground1Pressed);
-  transform: scale(0.98);
-}
-.btn:disabled, .btn.disabled {
-  background: var(--colorNeutralBackgroundDisabled);
-  border-color: var(--colorNeutralStrokeDisabled);
-  color: var(--colorNeutralForegroundDisabled);
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Primary Button */
-.btn.primary {
-  background: var(--colorBrandBackground);
-  color: #000000;
-  border-color: var(--colorBrandBackground);
-}
-.btn.primary:hover {
-  background: var(--colorBrandBackgroundHover);
-  border-color: var(--colorBrandBackgroundHover);
-}
-.btn.primary:active {
-  background: var(--colorBrandBackgroundPressed);
-  border-color: var(--colorBrandBackgroundPressed);
-}
-
-/* Danger Button */
-.btn.danger {
-  background: var(--colorStatusDangerBackground1);
-  border-color: var(--colorStatusDangerForeground1);
-  color: var(--colorStatusDangerForeground1);
-}
-.btn.danger:hover {
-  background: var(--colorStatusDangerBackground2);
-}
-
-/* Subtle Button */
-.btn.subtle {
-  background: transparent;
-  border-color: transparent;
-}
-.btn.subtle:hover {
-  background: var(--colorSubtleBackgroundHover);
-  border-color: transparent;
-}
 
 /* ========================================
    KPI / Stats
@@ -685,29 +569,13 @@ a:hover { color: var(--colorBrandForeground2); }
 .trow:hover { background: var(--colorNeutralBackground1); }
 
 /* ========================================
-   Modal / Dialog
+   Modal / Dialog (Legacy - Fluent UI <Dialog> now used)
+   Animations kept for other uses
    ======================================== */
-.modalOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-  animation: fadeIn var(--durationFast) var(--curveDecelerateMax);
-}
-
 .modal {
   width: min(940px, 92vw);
   max-height: min(86vh, 980px);
   overflow: auto;
-  border-radius: var(--borderRadiusXLarge);
-  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
-  background: var(--colorNeutralBackground3);
-  padding: var(--spacingXL);
-  box-shadow: var(--shadow64);
-  animation: slideUp var(--durationNormal) var(--curveDecelerateMax);
 }
 
 @keyframes fadeIn {

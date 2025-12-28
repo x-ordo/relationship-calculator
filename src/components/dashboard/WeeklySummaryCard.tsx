@@ -1,5 +1,5 @@
-/** @jsxImportSource preact */
-import { useMemo } from 'preact/hooks'
+import { useMemo } from 'react'
+import { Badge, Card } from '@fluentui/react-components'
 import type { AppState as DomainState } from '../../shared/storage/state'
 import { buildReport } from '../../shared/domain/report'
 
@@ -37,45 +37,47 @@ export function WeeklySummaryCard({ domain }: { domain: DomainState }) {
   const hasData = week.totals.entries > 0
 
   return (
-    <div class="card">
-      <div class="row" style={{ justifyContent: 'space-between' }}>
+    <Card className="card">
+      <div className="row" style={{ justifyContent: 'space-between' }}>
         <div>
-          <div class="h2">주간 요약</div>
-          <div class="hint">{label}</div>
+          <div className="h2">주간 요약</div>
+          <div className="hint">{label}</div>
         </div>
-        <div class={`badge ${deltaLoss > 0 ? 'danger' : 'ok'}`}>{deltaText}</div>
+        <Badge color={deltaLoss > 0 ? 'danger' : 'success'} appearance="filled">
+          {deltaText}
+        </Badge>
       </div>
 
       {!hasData && (
-        <div class="callout" style={{ marginTop: 12 }}>
+        <div className="callout" style={{ marginTop: 12 }}>
           <div style={{ fontWeight: 950 }}>이번 주 기록 0개</div>
-          <div class="hint">오늘 10초 기록 1번만 찍으면, 다음 주부터 ‘패턴’이 보인다.</div>
+          <div className="hint">오늘 10초 기록 1번만 찍으면, 다음 주부터 '패턴'이 보인다.</div>
         </div>
       )}
 
       {hasData && (
-        <div class="stats" style={{ marginTop: 12 }}>
-          <div class="stat">
-            <div class="hint">손실</div>
-            <div class="big danger">₩{week.totals.netLossWon.toLocaleString()}</div>
+        <div className="stats" style={{ marginTop: 12 }}>
+          <div className="stat">
+            <div className="hint">손실</div>
+            <div className="big danger">₩{week.totals.netLossWon.toLocaleString()}</div>
           </div>
-          <div class="stat">
-            <div class="hint">시간</div>
-            <div class="big">{hours}h</div>
+          <div className="stat">
+            <div className="hint">시간</div>
+            <div className="big">{hours}h</div>
           </div>
-          <div class="stat">
-            <div class="hint">원인 1위</div>
-            <div class="big">{week.topCauseLabel}</div>
+          <div className="stat">
+            <div className="hint">원인 1위</div>
+            <div className="big">{week.topCauseLabel}</div>
           </div>
         </div>
       )}
 
       {hasData && (
-        <div class="callout" style={{ marginTop: 12 }}>
+        <div className="callout" style={{ marginTop: 12 }}>
           <div style={{ fontWeight: 950 }}>손해 1위: <span style={{ color: 'var(--accent)' }}>{week.topPersonLabel}</span></div>
-          <div class="hint">핵심: {week.topCauseLabel} 한 가지만 막아도 손실이 줄어든다.</div>
+          <div className="hint">핵심: {week.topCauseLabel} 한 가지만 막아도 손실이 줄어든다.</div>
         </div>
       )}
-    </div>
+    </Card>
   )
 }

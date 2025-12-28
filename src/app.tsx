@@ -19,13 +19,13 @@ import { useSwipe } from './shared/hooks/useSwipe'
 
 const TAB_ORDER: TabType[] = ['dashboard', 'coach', 'share', 'pro']
 
-const VISITED_KEY = 'roi_visited'
+const VISITED_KEY = 'roi_visited_session'
 
 export function App() {
   const [state, dispatch] = useReducer(reducer, undefined, initialState)
   const [theme, setTheme] = useState<Theme>('dark')
   const [showLanding, setShowLanding] = useState(() => {
-    return !localStorage.getItem(VISITED_KEY)
+    return !sessionStorage.getItem(VISITED_KEY)
   })
 
   const stateRef = useRef<AppState>(state)
@@ -48,7 +48,7 @@ export function App() {
   }
 
   const handleStartApp = () => {
-    localStorage.setItem(VISITED_KEY, 'true')
+    sessionStorage.setItem(VISITED_KEY, 'true')
     setShowLanding(false)
   }
 

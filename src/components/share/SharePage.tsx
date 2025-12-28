@@ -161,16 +161,16 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
       </div>
 
       <Dialog open={introOpen} onOpenChange={(_, data) => !data.open && setIntroOpen(false)}>
-        <DialogSurface className="modal">
-          <DialogBody>
+        <DialogSurface className="modal" style={{ maxWidth: 480 }}>
+          <DialogBody style={{ display: 'block' }}>
             <div className="h2">첫 방문 안전 안내</div>
-            <div className="hint">공유는 "한 번" 삐끗하면 끝. 여기서 기준을 박고 간다.</div>
+            <div className="hint" style={{ marginTop: 4 }}>공유는 "한 번" 삐끗하면 끝. 여기서 기준을 박고 간다.</div>
 
             <div className="callout danger" style={{ marginTop: 12 }}>
               <div style={{ fontWeight: 950 }}>필수 룰</div>
-              <ul style={{ marginTop: 8, paddingLeft: 18 }}>
-                <li className="hint">실명/회사명/학교/연락처/카톡ID/계좌 같은 식별정보는 절대 올리지 마.</li>
-                <li className="hint">'상대 익명화(A/B/C)'는 기본 ON 추천.</li>
+              <ul style={{ marginTop: 8, paddingLeft: 18, margin: 0 }}>
+                <li className="hint" style={{ marginBottom: 4 }}>실명/회사명/학교/연락처/카톡ID/계좌 같은 식별정보는 절대 올리지 마.</li>
+                <li className="hint" style={{ marginBottom: 4 }}>'상대 익명화(A/B/C)'는 기본 ON 추천.</li>
                 <li className="hint">저장 버튼 누르면 체크리스트를 강제로 통과해야 저장됨.</li>
               </ul>
             </div>
@@ -179,14 +179,14 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
             <div className="hint">아래 "필수"는 저장할 때도 다시 체크한다.</div>
             <div style={{ marginTop: 10 }}>
               {SHARE_CHECKLIST.slice(0, 6).map(item => (
-                <div key={item.id} className="row" style={{ gap: 10, marginBottom: 8 }}>
+                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                   <div className={`pill ${item.must ? 'danger' : ''}`}>{item.must ? '필수' : '권장'}</div>
                   <div style={{ fontWeight: item.must ? 950 : 700 }}>{item.label}</div>
                 </div>
               ))}
             </div>
 
-            <div className="row" style={{ justifyContent: 'flex-end', marginTop: 14 }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 14 }}>
               <Button
                 appearance="primary"
                 onClick={() => {

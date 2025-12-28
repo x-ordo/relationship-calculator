@@ -48,3 +48,15 @@
   padding: var(--spacingS);
   border-radius: var(--borderRadiusMedium);
 }
+
+/* Mobile: 최근 기록 카드 레이아웃 조정 */
+@media (max-width: 480px) {
+  .listItem {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacingS);
+  }
+  .listItem .row {
+    justify-content: flex-end;
+  }
+}

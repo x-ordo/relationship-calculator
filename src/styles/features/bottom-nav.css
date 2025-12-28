@@ -85,6 +85,6 @@
 
   /* Adjust FAB position to account for bottom nav */
   .fab {
-    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
   }
 }

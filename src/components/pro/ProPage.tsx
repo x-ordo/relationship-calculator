@@ -34,7 +34,7 @@ function getPaymentPhaseText(phase: string): { title: string; hint: string } {
 export function ProPage({ state, dispatch, actions }: { state: AppState; dispatch: (e: AppEvent) => void; actions: Actions }) {
   const token = state.domain.entitlement?.token || ''
   const expiresAt = state.domain.entitlement?.expiresAt
-  const paid = state.domain.plan === 'paid'
+  const paid = state.domain.plan !== 'free'
 
   const unlock = state.proUi.unlock
   const payment = state.proUi.payment

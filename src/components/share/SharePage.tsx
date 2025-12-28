@@ -343,7 +343,7 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
               <div style={{ padding: 22, position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <div className="row" style={{ justifyContent: 'space-between' }}>
                   <div style={{ fontWeight: 900, letterSpacing: '-0.3px' }}>Relationship ROI</div>
-                  <div style={{ fontSize: 12, color: layout.sub }}>{domain.plan === 'paid' ? 'PRO' : 'FREE'} · {report.windowLabel}</div>
+                  <div style={{ fontSize: 12, color: layout.sub }}>{domain.plan.toUpperCase()} · {report.windowLabel}</div>
                 </div>
 
                 <div style={{ marginTop: 18, fontSize: layout.hSize * 0.55, lineHeight: 1.12, fontWeight: 950 }}>

@@ -423,7 +423,7 @@ export function OnboardingOverlay({ domain, dispatch }: { domain: DomainState; d
                     <div className="obPreview">
                       <div className="obPreviewTop">
                         <div style={{ fontWeight: 900 }}>Relationship ROI</div>
-                        <div className="pill">{domain.plan === 'paid' ? 'PRO' : 'FREE'}</div>
+                        <div className="pill">{domain.plan.toUpperCase()}</div>
                       </div>
                       <div className="obBig">{report.totals.netLossWon.toLocaleString()}원</div>
                       <div className="hint">이번 창(기본): 순손해</div>

@@ -39,7 +39,7 @@ export function reducer(s: AppState, e: AppEvent): AppState {
     case 'TOKEN_SET':
       return {
         ...s,
-        domain: { ...s.domain, plan: 'paid', entitlement: { ...s.domain.entitlement, token: e.token } },
+        domain: { ...s.domain, plan: 'pro', entitlement: { ...s.domain.entitlement, token: e.token } },
       }
 
     case 'TOKEN_UNSET':

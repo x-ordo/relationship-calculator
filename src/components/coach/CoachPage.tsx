@@ -36,7 +36,7 @@ const GRADE_LABELS: Record<CoachResult['grade'], string> = {
 export function CoachPage({ state, dispatch, actions }: { state: AppState; dispatch: (e: AppEvent) => void; actions: Actions }) {
   const report = useMemo(() => buildReport(state.domain), [state.domain])
 
-  const paid = state.domain.plan === 'paid'
+  const paid = state.domain.plan !== 'free'
   const token = state.domain.entitlement?.token || ''
   const paidReady = paid && !!token
 

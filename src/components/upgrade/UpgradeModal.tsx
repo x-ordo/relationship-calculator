@@ -70,7 +70,7 @@ export function UpgradeModal({ reason, currentCount, limit, onClose, dispatch }:
 
     const result = await requestPayment('plus_lifetime')
 
-    if (result.success) {
+    if (result.success === true) {
       setPaymentState('success')
       // dispatch로 상태 업데이트
       if (dispatch) {
@@ -85,7 +85,7 @@ export function UpgradeModal({ reason, currentCount, limit, onClose, dispatch }:
       setTimeout(() => {
         onClose()
       }, 1500)
-    } else {
+    } else if (result.success === false) {
       setPaymentState('error')
       setErrorMessage(result.error)
     }

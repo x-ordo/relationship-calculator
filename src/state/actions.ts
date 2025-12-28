@@ -103,8 +103,8 @@ export async function runCoach(dispatch: Dispatch, getState: GetState) {
   const s0 = getState()
   const { tone, situation, context } = s0.coachUi.draft
 
-  // Rate limit 체크 (PRO만 적용)
-  if (s0.domain.plan === 'paid') {
+  // Rate limit 체크 (유료 플랜만 적용)
+  if (s0.domain.plan !== 'free') {
     const limitCheck = checkRateLimit(s0.coachUi.rateLimit)
     if (!limitCheck.allowed) {
       dispatch({
@@ -119,8 +119,8 @@ export async function runCoach(dispatch: Dispatch, getState: GetState) {
 
   const report = buildReport(s0.domain)
 
-  // PAID path
-  if (s0.domain.plan === 'paid') {
+  // 유료 플랜 path (plus, pro)
+  if (s0.domain.plan !== 'free') {
     const token = s0.domain.entitlement?.token || ''
     if (!token) {
       dispatch({ type: 'COACH_NEED_PRO', need: true })
@@ -185,7 +185,7 @@ export async function purchasePro(dispatch: Dispatch, productId: ProductId) {
       // sdk_loading, payment_pending은 PAYMENT_START에서 이미 처리됨
     })
     if (result.success === true) {
-      dispatch({ type: 'PAYMENT_OK', token: result.token, expiresAt: result.expiresAt })
+      dispatch({ type: 'PAYMENT_OK', token: result.token, plan: result.plan, expiresAt: result.expiresAt })
     } else if (result.success === false) {
       dispatch({ type: 'PAYMENT_FAIL', error: result.error })
     }
@@ -201,7 +201,7 @@ export async function checkPaymentCallback(dispatch: Dispatch) {
     if (!result) return // 콜백 아님
 
     if (result.success === true) {
-      dispatch({ type: 'PAYMENT_OK', token: result.token, expiresAt: result.expiresAt })
+      dispatch({ type: 'PAYMENT_OK', token: result.token, plan: result.plan, expiresAt: result.expiresAt })
     } else if (result.success === false) {
       dispatch({ type: 'PAYMENT_FAIL', error: result.error })
     }

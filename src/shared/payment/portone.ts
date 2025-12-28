@@ -5,7 +5,9 @@
  * 주의: 실제 storeId는 환경변수로 관리해야 함 (VITE_PORTONE_STORE_ID)
  */
 
-export type ProductId = 'pro_monthly' | 'pro_yearly'
+import type { Plan } from '../storage/state'
+
+export type ProductId = 'plus_lifetime' | 'pro_monthly' | 'pro_yearly'
 
 export type Product = {
   id: ProductId
@@ -15,13 +17,22 @@ export type Product = {
   expiryDays: number
 }
 
-export const PRODUCTS: Record<ProductId, Product> = {
+export const PRODUCTS: Record<ProductId, Product & { plan: Plan }> = {
+  plus_lifetime: {
+    id: 'plus_lifetime',
+    name: 'PLUS 평생 이용권',
+    price: 4900,
+    description: '10명 관리, 프리미엄 공유 카드 30종+, AI 판결 3회',
+    expiryDays: 36500, // ~100년
+    plan: 'plus',
+  },
   pro_monthly: {
     id: 'pro_monthly',
     name: 'PRO 월간',
     price: 9900,
     description: 'AI 판사 무제한 이용 (30일)',
     expiryDays: 30,
+    plan: 'pro',
   },
   pro_yearly: {
     id: 'pro_yearly',
@@ -29,6 +40,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
     price: 99000,
     description: 'AI 판사 무제한 이용 (365일) - 2개월 무료',
     expiryDays: 365,
+    plan: 'pro',
   },
 }
 
@@ -36,6 +48,7 @@ export type PaymentResult = {
   success: true
   paymentId: string
   token: string
+  plan: Plan
   expiresAt: string
 } | {
   success: false
@@ -157,6 +170,7 @@ export async function requestPayment(
       success: true,
       paymentId: response.paymentId,
       token: verifyData.token,
+      plan: verifyData.plan as Plan,
       expiresAt: verifyData.expiresAt,
     }
 
@@ -206,6 +220,7 @@ export async function handlePaymentCallback(): Promise<PaymentResult | null> {
       success: true,
       paymentId,
       token: verifyData.token,
+      plan: verifyData.plan as Plan,
       expiresAt: verifyData.expiresAt,
     }
 

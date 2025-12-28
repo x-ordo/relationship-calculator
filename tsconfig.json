@@ -11,7 +11,11 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@content/*": ["content/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "content"]
 }

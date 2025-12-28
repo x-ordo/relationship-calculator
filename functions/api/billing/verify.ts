@@ -18,9 +18,10 @@ export interface Env {
 }
 
 /** 가격 테이블 (KRW) */
-const PRICE_TABLE: Record<string, number> = {
-  'pro_monthly': 9900,
-  'pro_yearly': 99000,
+const PRICE_TABLE: Record<string, { amount: number; plan: 'plus' | 'pro'; expiryDays: number }> = {
+  'plus_lifetime': { amount: 4900, plan: 'plus', expiryDays: 36500 }, // ~100년 (평생)
+  'pro_monthly': { amount: 9900, plan: 'pro', expiryDays: 30 },
+  'pro_yearly': { amount: 99000, plan: 'pro', expiryDays: 365 },
 }
 
 /**
@@ -72,16 +73,16 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
     // 3. 상품 ID 및 금액 검증
     const productId = paymentData.orderName || paymentData.customData?.productId
-    const expectedAmount = PRICE_TABLE[productId]
+    const product = PRICE_TABLE[productId]
 
-    if (!expectedAmount) {
+    if (!product) {
       console.error('[verify] Unknown product:', productId)
       return json({ error: '알 수 없는 상품입니다' }, { status: 400 })
     }
 
     const paidAmount = paymentData.amount?.total || paymentData.totalAmount
-    if (paidAmount !== expectedAmount) {
-      console.error('[verify] Amount mismatch:', { expected: expectedAmount, paid: paidAmount })
+    if (paidAmount !== product.amount) {
+      console.error('[verify] Amount mismatch:', { expected: product.amount, paid: paidAmount })
       return json({ error: '결제 금액이 일치하지 않습니다' }, { status: 400 })
     }
 
@@ -94,9 +95,9 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       }
     }
 
-    // 5. PRO 토큰 발급 (HMAC 서명)
-    const expiryDays = productId === 'pro_yearly' ? 365 : 30
-    const prefix = ctx.env.PRO_TOKEN_PREFIX || 'pro'
+    // 5. 토큰 발급 (HMAC 서명)
+    const { expiryDays, plan } = product
+    const prefix = plan === 'plus' ? 'plus' : (ctx.env.PRO_TOKEN_PREFIX || 'pro')
     const secret = ctx.env.TOKEN_SECRET || 'dev-secret-do-not-use-in-prod'
     const token = await issueSignedToken(prefix, expiryDays, secret)
 
@@ -110,6 +111,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       await ctx.env.TOKEN_KV.put(`token:${token}`, JSON.stringify({
         paymentId,
         productId,
+        plan,
         amount: paidAmount,
         issuedAt: new Date().toISOString(),
       }), {
@@ -117,10 +119,11 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       })
     }
 
-    console.log('[verify] Token issued:', { paymentId, productId, tokenPrefix: token.slice(0, 10) })
+    console.log('[verify] Token issued:', { paymentId, productId, plan, tokenPrefix: token.slice(0, 10) })
 
     return json({
       token,
+      plan,
       expiresAt: new Date(Date.now() + expiryDays * 86400000).toISOString(),
       productId,
     })

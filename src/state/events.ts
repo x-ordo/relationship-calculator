@@ -40,6 +40,6 @@ export type AppEvent =
   // payment
   | { type: 'PAYMENT_START' }
   | { type: 'PAYMENT_VERIFYING' }
-  | { type: 'PAYMENT_OK'; token: string; expiresAt: string }
+  | { type: 'PAYMENT_OK'; token: string; plan: Plan; expiresAt: string }
   | { type: 'PAYMENT_FAIL'; error: string }
   | { type: 'PAYMENT_RESET' }

@@ -4,6 +4,7 @@ import type { AppState as DomainState } from '../../shared/storage/state'
 import type { AppEvent } from '../../state/events'
 import { uid } from '../../shared/storage/state'
 import { buildReport, causeLabel, type CauseKey } from '../../shared/domain/report'
+import { canAddPerson } from '../../shared/domain/limits'
 import { QuickLogBar } from './QuickLogBar'
 import { QuickLogSheet } from './QuickLogSheet'
 import { QuickLogFab } from './QuickLogFab'
@@ -13,6 +14,7 @@ import { EditEntryModal } from './EditEntryModal'
 import { BackupRestoreCard } from './BackupRestoreCard'
 import { InsightBanner } from './InsightBanner'
 import { PersonDetailPage } from '../person/PersonDetailPage'
+import { UpgradeModal, type UpgradeReason } from '../upgrade/UpgradeModal'
 import type { Entry, Person } from '../../shared/storage/state'
 import {
   validatePersonName,
@@ -43,6 +45,7 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
   const [detailPerson, setDetailPerson] = useState<Person | null>(null)
   const [filterPersonId, setFilterPersonId] = useState('')
   const [filterCause, setFilterCause] = useState<CauseKey | ''>('')
+  const [upgradeModal, setUpgradeModal] = useState<{ reason: UpgradeReason; currentCount?: number; limit?: number } | null>(null)
 
   // Filter people by view filter
   const filteredPeople = useMemo(() => {
@@ -82,6 +85,17 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
   }
 
   const addPerson = () => {
+    // 인원 제한 체크
+    const personLimit = canAddPerson(domain.plan, domain.people.length)
+    if (!personLimit.allowed) {
+      setUpgradeModal({
+        reason: 'person_limit',
+        currentCount: domain.people.length,
+        limit: personLimit.limit,
+      })
+      return
+    }
+
     const validation = validatePersonName(newPersonName)
     if (!validation.valid) {
       setPersonNameError(validation.error || '')
@@ -446,6 +460,17 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
   personId={entryPersonId}
   setPersonId={setEntryPersonId}
 />
+
+      {/* 업그레이드 모달 */}
+      {upgradeModal && (
+        <UpgradeModal
+          reason={upgradeModal.reason}
+          currentCount={upgradeModal.currentCount}
+          limit={upgradeModal.limit}
+          onClose={() => setUpgradeModal(null)}
+          dispatch={dispatch}
+        />
+      )}
     </div>
   )
 }

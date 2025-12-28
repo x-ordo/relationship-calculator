@@ -8,6 +8,8 @@ import { SHARE_CARD_LAYOUTS, LAYOUT_CATEGORIES, type LayoutId, type LayoutCatego
 import { exportShareCardPng } from '../../shared/utils/exportShareCard'
 import { buildAliasMap, anonymizeName, anonymizeText } from '../../shared/utils/anonymize'
 import { buildShareSafetyReport, formatFinding, SHARE_CHECKLIST } from '../../shared/privacy/shareSafety'
+import { isLayoutAvailable, FREE_LAYOUTS } from '../../shared/domain/limits'
+import { UpgradeModal } from '../upgrade/UpgradeModal'
 
 export function SharePage({ domain, dispatch }: { domain: DomainState, dispatch: (e: AppEvent) => void }) {
   const report = useMemo(() => buildReport(domain), [domain])
@@ -21,6 +23,7 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
   const bumpAnim = () => setAnimKey((k) => k + 1)
   const [checked, setChecked] = useState<Record<string, boolean>>(() => Object.fromEntries(SHARE_CHECKLIST.map(i => [i.id, !i.must])))
   const [introOpen, setIntroOpen] = useState(() => !domain.settings.shareSafetyIntroSeen)
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false)
 
 
   const filteredCopyList = useMemo(() => {
@@ -156,7 +159,7 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
           <div className="hint">인스타 스토리 1080×1920. 익명화 + PII 스캔 + 체크리스트로 사고 방지.</div>
         </div>
         <div className="row">
-          <Badge>{domain.plan === 'paid' ? 'PRO' : 'FREE'}</Badge>
+          <Badge>{domain.plan === 'pro' ? 'PRO' : domain.plan === 'plus' ? 'PLUS' : 'FREE'}</Badge>
         </div>
       </div>
 
@@ -227,8 +230,25 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
           <div className="row" style={{ marginTop: 10, flexWrap: 'wrap', gap: 8 }}>
             <label className="pill">
               레이아웃
-              <select value={layoutId} onChange={(e) => setLayoutId(e.currentTarget.value as LayoutId)}>
-                {filteredLayoutList.map(l => <option key={l.id} value={l.id}>{l.category} · {l.name}</option>)}
+              <select
+                value={layoutId}
+                onChange={(e) => {
+                  const newId = e.currentTarget.value as LayoutId
+                  if (!isLayoutAvailable(domain.plan, newId)) {
+                    setUpgradeModalOpen(true)
+                    return
+                  }
+                  setLayoutId(newId)
+                }}
+              >
+                {filteredLayoutList.map(l => {
+                  const locked = !isLayoutAvailable(domain.plan, l.id)
+                  return (
+                    <option key={l.id} value={l.id}>
+                      {locked ? '🔒 ' : ''}{l.category} · {l.name}
+                    </option>
+                  )
+                })}
               </select>
             </label>
 
@@ -446,6 +466,15 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
           </DialogBody>
         </DialogSurface>
       </Dialog>
+
+      {/* 업그레이드 모달 */}
+      {upgradeModalOpen && (
+        <UpgradeModal
+          reason="layout_locked"
+          onClose={() => setUpgradeModalOpen(false)}
+          dispatch={dispatch}
+        />
+      )}
     </div>
   )
 }

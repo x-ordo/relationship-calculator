@@ -34,16 +34,93 @@ Relationship ROI를 **MVP(v0.5) → 수익화 가능한 v1**으로 올린다.
 
 4) **콘텐츠/바이럴**
 - 공유 카드 테마 30개로 확장
-- ‘익명 템플릿’ 기반 스토리 카피 세트 확장
+- '익명 템플릿' 기반 스토리 카피 세트 확장
 
-## 코드 스타일
-- 의존성 최소화
-- UI는 단순. 컴포넌트는 작게.
-- 계산 로직은 `src/shared/domain`에 유지
-- 서버 코드는 `functions/`에만 둔다(프론트와 분리)
+---
+
+## 개발 원칙
+
+### 1. TDD (Test-Driven Development)
+- 테스트 먼저 작성 → Red/Green/Refactor 사이클
+- 기능 구현 전 테스트 케이스 정의
+
+### 2. 외부 설정
+- 수동 설정 필요 시 **GitHub Issue 등록 필수**
+- 환경변수, 시크릿 등 외부 의존성 명시
+
+### 3. 디자인 시스템
+- **Clean Architecture**: 계층 분리 (domain → shared → components)
+- **DI (Dependency Injection)**: 의존성 주입으로 테스트 용이성 확보
+- **Event-Driven**: 상태 변경은 이벤트 기반 (`src/state/events.ts`)
+
+### 4. 커밋 메시지
+- **Conventional Commits**: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`
+- AI 언급 금지 (Generated with Claude, Co-Authored-By 등)
+- 한국어로 간결하게 작성
+
+### 5. 코드 스타일
+- TypeScript strict mode
+- ESLint/Prettier 규칙 준수
+- **단일 책임 원칙 (SRP)**: 하나의 모듈은 하나의 책임만
+- 의존성 최소화, 컴포넌트는 작게
+
+### 6. 응답 원칙
+
+**CTO 관점:**
+- 결정 중심 (옵션 나열 X)
+- 트레이드오프/리스크/ROI 명시
+- P0/P1/P2 우선순위
+- 간결함
+
+**객관성:**
+- 감정 배제
+- 사실 기반
+- 정량적 표현
+
+**근거 확보:**
+- 공식 문서 참조
+- 코드 라인 명시 (예: `file.ts:123`)
+- 테스트 결과 포함
+- 벤치마크 데이터
+
+**금지 표현:**
+- ❌ "아마도...", "~일 것 같습니다"
+- ❌ "보통은...", "일반적으로..."
+- ❌ 출처 없는 주장
+
+### 7. PR 체크리스트
+- [ ] 타입체크 통과 (`pnpm typecheck`)
+- [ ] 빌드 성공 (`pnpm build`)
+- [ ] 테스트 통과 (해당 시)
+- [ ] 모바일 레이아웃 확인
+- [ ] 기존 기능 회귀 없음
+- [ ] 보안 취약점 없음
+- [ ] 커밋 메시지 컨벤션 준수
+
+---
+
+## 비즈니스 마인드셋
+
+| 항목 | 내용 |
+|------|------|
+| 소비자 중심 사고 | 리서치/피드백은 최종 사용자 관점 |
+| 비즈니스 임팩트 | 수익/비용/시장 영향 고려 |
+| 가치 전달 | 기술 ≠ 비즈니스 구분 |
+| 시장 현실 | 이상 < 실용 |
+
+B2C/B2B/B2G 전 영역 적용.
+
+---
 
 ## Git 규칙
 - **main 직접 푸시 절대 금지** → 반드시 feature 브랜치 생성 후 PR
 - "Generated with Claude Code" 푸터 사용 금지
 - "Co-Authored-By" 사용 금지
 - 커밋 메시지는 한국어로 간결하게 작성
+
+## 코드 구조
+- 계산 로직: `src/shared/domain`
+- 상태 관리: `src/state` (events, reducer, actions)
+- UI 컴포넌트: `src/components`
+- 서버 코드: `functions/` (프론트와 분리)
+- 콘텐츠: `content/` (YAML 파일)

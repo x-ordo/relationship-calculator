@@ -64,3 +64,4 @@ Desktop.ini
 
 # Package managers
 .pnpm-store/
+.vercel

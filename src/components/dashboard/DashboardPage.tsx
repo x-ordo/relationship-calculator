@@ -140,19 +140,30 @@ export function DashboardPage({ domain, dispatch }: { domain: DomainState, dispa
     if (entryPersonId === id) setEntryPersonId('')
   }
 
+  // 손익 상태에 따른 스탬프 타입 결정
+  const stampType = report.totals.netLossWon > 50000 ? 'danger' : report.totals.netLossWon > 10000 ? 'warning' : 'verified'
+  const stampLabel = stampType === 'danger' ? '손실 경고' : stampType === 'warning' ? '주의 필요' : '양호'
+
   return (
-    <div class="panel">
-      {/* Hero Section - Total Loss */}
-      <div class="card" style={{ background: 'var(--colorNeutralBackground4)', border: '2px solid var(--colorStatusDangerForeground1)', marginBottom: 16 }}>
-        <div class="hint" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>현재까지 총 손실</div>
-        <div style={{ fontSize: 'var(--fontSizeHero900)', fontWeight: 700, color: 'var(--colorStatusDangerForeground1)', lineHeight: 1.1, marginTop: 4 }}>
+    <div class="panel animate-page-enter">
+      {/* Hero Section - Total Loss with Stamp */}
+      <div class="hero-section" style={{ background: 'var(--colorNeutralBackground4)', border: '2px solid var(--colorStatusDangerForeground1)', marginBottom: 16 }}>
+        {/* Audit Stamp */}
+        <div class="hero-stamp animate-stamp">
+          <div class={`audit-stamp ${stampType}`}>
+            {stampLabel}
+          </div>
+        </div>
+
+        <div class="hint mono-font" style={{ textTransform: 'uppercase', letterSpacing: '0.15em', fontSize: 'var(--fontSizeBase100)' }}>현재까지 총 손실</div>
+        <div class="hero-value danger" style={{ marginTop: 8 }}>
           -₩{report.totals.netLossWon.toLocaleString()}
         </div>
-        <div class="hint" style={{ marginTop: 8 }}>
+        <div class="hint mono-font" style={{ marginTop: 12 }}>
           시간 {totalHours}h · 직접 비용 ₩{totalDirectMoney.toLocaleString()} · ROI {report.totals.roiPct}%
         </div>
         {report.topCauseLabel && (
-          <div style={{ marginTop: 8 }}>
+          <div style={{ marginTop: 12 }}>
             <span class="pillMini danger">손해 1위</span>
             <span style={{ marginLeft: 8, fontWeight: 700 }}>{report.topPersonLabel}</span>
             <span class="muted" style={{ marginLeft: 8 }}>원인: {report.topCauseLabel}</span>

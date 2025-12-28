@@ -4,6 +4,7 @@ import { DashboardPage } from './components/dashboard/DashboardPage'
 import { CoachPage } from './components/coach/CoachPage'
 import { SharePage } from './components/share/SharePage'
 import { ProPage } from './components/pro/ProPage'
+import { LandingPage } from './components/landing/LandingPage'
 import { OnboardingOverlay, needsOnboarding } from './components/onboarding/OnboardingOverlay'
 import { BottomNav } from './components/nav/BottomNav'
 import { reducer } from './state/reducer'
@@ -16,9 +17,15 @@ import { useSwipe } from './shared/hooks/useSwipe'
 
 const TAB_ORDER: Tab[] = ['dashboard', 'coach', 'share', 'pro']
 
+const VISITED_KEY = 'roi_visited'
+
 export function App() {
   const [state, dispatch] = useReducer(reducer, undefined, initialState)
   const [theme, setTheme] = useState<Theme>('dark')
+  const [showLanding, setShowLanding] = useState(() => {
+    // 첫 방문자에게만 랜딩 페이지 표시
+    return !localStorage.getItem(VISITED_KEY)
+  })
 
   const stateRef = useRef<AppState>(state)
   useEffect(() => {
@@ -38,6 +45,11 @@ export function App() {
     setTheme(next)
     saveTheme(next)
     applyTheme(next)
+  }
+
+  const handleStartApp = () => {
+    localStorage.setItem(VISITED_KEY, 'true')
+    setShowLanding(false)
   }
 
   // persist domain when ready (avoid overwriting storage during BOOT/LOADING)
@@ -83,6 +95,11 @@ export function App() {
   }, [tab])
 
   useSwipe({ onSwipe: handleSwipe, threshold: 80 })
+
+  // 랜딩 페이지 표시
+  if (showLanding) {
+    return <LandingPage onStart={handleStartApp} />
+  }
 
   return (
     <div class="app">

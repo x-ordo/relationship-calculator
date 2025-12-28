@@ -5,6 +5,7 @@ import type { AppEvent } from '../../state/events'
 import { buildReport } from '../../shared/domain/report'
 import type { CoachTone, CoachContext, CoachResult } from '../../shared/rules/fakeCoach'
 import { VoiceInputButton } from '../common/VoiceInputButton'
+import { LoadingSpinner } from '../common/LoadingSpinner'
 
 type Actions = {
   runCoach: () => any
@@ -186,6 +187,13 @@ export function CoachPage({ state, dispatch, actions }: { state: AppState; dispa
           </button>
         )}
       </div>
+
+      {/* 로딩 상태 - 동적 메시지 스피너 */}
+      {run.status === 'loading' && (
+        <div class="card" style={{ marginTop: 16 }}>
+          <LoadingSpinner variant="coach" color="gold" />
+        </div>
+      )}
 
       {run.status === 'error' && (
         <div class="callout danger" style={{ marginTop: 12 }}>

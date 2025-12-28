@@ -1,0 +1,50 @@
+/* ========================================
+   Callout / Alert
+   ======================================== */
+
+.callout {
+  border: var(--strokeWidthThin) solid var(--colorBrandStroke1);
+  background: rgba(40,153,245,0.08);
+  border-radius: var(--borderRadiusLarge);
+  padding: var(--spacingM);
+}
+.callout.ok {
+  border-color: var(--colorStatusSuccessForeground1);
+  background: var(--colorStatusSuccessBackground1);
+}
+.callout.danger {
+  border-color: var(--colorStatusDangerForeground1);
+  background: var(--colorStatusDangerBackground1);
+}
+
+/* ========================================
+   List
+   ======================================== */
+
+.list { display: grid; gap: var(--spacingS); }
+.listItem {
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  background: var(--colorNeutralBackground2);
+  border-radius: var(--borderRadiusLarge);
+  padding: var(--spacingM);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacingM);
+  transition: background var(--durationFast) var(--curveEasyEase);
+}
+.listItem:hover {
+  background: var(--colorNeutralBackground1);
+}
+
+.note {
+  margin-top: var(--spacingXS);
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+  color: var(--colorNeutralForeground2);
+  white-space: pre-wrap;
+  background: var(--colorNeutralBackground2);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  padding: var(--spacingS);
+  border-radius: var(--borderRadiusMedium);
+}

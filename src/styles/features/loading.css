@@ -1,0 +1,39 @@
+/* ========================================
+   Loading Spinner with Dynamic Message
+   ======================================== */
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacingL);
+  padding: var(--spacingXXXL);
+  min-height: 200px;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--colorNeutralStroke2);
+  border-top-color: var(--colorBrandBackground);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-spinner.gold {
+  border-top-color: var(--colorAuditGold);
+}
+
+.loading-message {
+  font-family: var(--fontFamilyMonospace);
+  font-size: var(--fontSizeBase300);
+  color: var(--colorNeutralForeground3);
+  text-align: center;
+  min-height: 24px;
+  transition: opacity var(--durationFast) var(--curveEasyEase);
+}
+
+.loading-message.fade {
+  opacity: 0.5;
+}

@@ -1,0 +1,91 @@
+/* ========================================
+   Responsive - Mobile Breakpoints
+   ======================================== */
+
+@media (max-width: 520px) {
+  .stats { grid-template-columns: 1fr; }
+  .thead, .trow { grid-template-columns: 1.2fr 1fr 0.8fr 0.6fr; font-size: var(--fontSizeBase200); }
+}
+
+@media (max-width: 480px) {
+  .container { padding: var(--spacingM); }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacingS);
+    padding: var(--spacingS) var(--spacingM);
+  }
+
+  .brand { justify-content: center; }
+  .tabs { justify-content: center; }
+
+  .tab {
+    padding: var(--spacingXS) var(--spacingS);
+    font-size: var(--fontSizeBase200);
+  }
+
+  .h1 { font-size: var(--fontSizeBase500); }
+  .panel { padding: var(--spacingM); }
+}
+
+/* QuickLogBar - Mobile */
+@media (max-width: 520px) {
+  .quickbar .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .qGroup { width: 100%; }
+  .qButtons { flex-wrap: wrap; }
+
+  .qBtn {
+    flex: 1 1 auto;
+    min-width: 44px;
+    min-height: 36px;
+    padding: var(--spacingXS) var(--spacingSNudge);
+    font-size: var(--fontSizeBase200);
+    text-align: center;
+  }
+
+  .qInput {
+    width: 100%;
+    max-width: 100px;
+    min-height: 36px;
+  }
+
+  .qLabel {
+    font-size: var(--fontSizeBase100);
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 380px) {
+  .qBtn {
+    min-width: 38px;
+    padding: var(--spacingXXS) var(--spacingXS);
+    font-size: var(--fontSizeBase100);
+  }
+
+  .qInput {
+    max-width: 80px;
+  }
+
+  .quickbar {
+    padding: var(--spacingS);
+  }
+}
+
+/* ========================================
+   Accessibility - Reduced Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

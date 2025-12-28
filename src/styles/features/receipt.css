@@ -1,0 +1,154 @@
+/* ========================================
+   Receipt Card
+   ======================================== */
+
+.receipt-card {
+  background: var(--colorNeutralBackground4);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  border-radius: var(--borderRadiusLarge);
+  padding: var(--spacingL);
+  font-family: var(--fontFamilyMonospace);
+  max-width: 400px;
+  margin: var(--spacingM) auto;
+  box-shadow: var(--shadow8);
+}
+
+.receipt-header {
+  text-align: center;
+  padding-bottom: var(--spacingM);
+}
+
+.receipt-store {
+  font-size: var(--fontSizeBase500);
+  font-weight: var(--fontWeightBold);
+  color: var(--colorNeutralForeground1);
+  letter-spacing: 0.05em;
+}
+
+.receipt-subtitle {
+  font-size: var(--fontSizeBase200);
+  color: var(--colorNeutralForeground3);
+  margin-top: var(--spacingXXS);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.receipt-divider {
+  margin: var(--spacingM) 0;
+  height: 0;
+}
+
+.receipt-divider.dashed {
+  border-bottom: var(--strokeWidthThin) dashed var(--colorNeutralStroke2);
+}
+
+.receipt-divider.solid {
+  border-bottom: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+}
+
+.receipt-meta {
+  font-size: var(--fontSizeBase200);
+  color: var(--colorNeutralForeground3);
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacingXXS) 0;
+  gap: var(--spacingS);
+}
+
+.receipt-row.header {
+  font-weight: var(--fontWeightBold);
+  color: var(--colorNeutralForeground2);
+  border-bottom: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  padding-bottom: var(--spacingS);
+  margin-bottom: var(--spacingXS);
+}
+
+.receipt-items {
+  font-size: var(--fontSizeBase300);
+  color: var(--colorNeutralForeground2);
+}
+
+.receipt-row.subtotal {
+  margin-top: var(--spacingS);
+  padding-top: var(--spacingS);
+  border-top: var(--strokeWidthThin) dashed var(--colorNeutralStroke2);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.receipt-row.total {
+  margin-top: var(--spacingS);
+  padding-top: var(--spacingS);
+  border-top: var(--strokeWidthThick) solid var(--colorNeutralStroke1);
+  font-size: var(--fontSizeBase500);
+  font-weight: var(--fontWeightBold);
+}
+
+.receipt-row.highlight {
+  color: var(--colorStatusDangerForeground1);
+}
+
+.receipt-cause {
+  font-size: var(--fontSizeBase300);
+  color: var(--colorNeutralForeground2);
+}
+
+.receipt-cause .accent {
+  color: var(--colorBrandForeground1);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.receipt-empty {
+  text-align: center;
+  padding: var(--spacingXL) 0;
+}
+
+.receipt-empty-title {
+  font-size: var(--fontSizeBase400);
+  font-weight: var(--fontWeightBold);
+  color: var(--colorNeutralForeground2);
+}
+
+.receipt-empty-hint {
+  font-size: var(--fontSizeBase200);
+  color: var(--colorNeutralForeground4);
+  margin-top: var(--spacingXS);
+}
+
+.receipt-footer {
+  text-align: center;
+  padding-top: var(--spacingM);
+}
+
+.receipt-verdict {
+  font-size: var(--fontSizeBase300);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--colorStatusWarningForeground1);
+  margin-bottom: var(--spacingS);
+}
+
+.receipt-brand {
+  font-size: var(--fontSizeBase100);
+  color: var(--colorNeutralForeground4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.receipt-tear {
+  margin-top: var(--spacingL);
+  height: 12px;
+  background-image: linear-gradient(
+    135deg,
+    var(--colorNeutralBackground4) 25%,
+    transparent 25%,
+    transparent 50%,
+    var(--colorNeutralBackground4) 50%,
+    var(--colorNeutralBackground4) 75%,
+    transparent 75%
+  );
+  background-size: 12px 12px;
+  background-position: 0 0;
+}

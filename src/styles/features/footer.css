@@ -1,0 +1,10 @@
+/* ========================================
+   Footer
+   ======================================== */
+
+.footer {
+  margin-top: var(--spacingL);
+  padding: var(--spacingS) var(--spacingXS);
+  color: var(--colorNeutralForeground4);
+  font-size: var(--fontSizeBase200);
+}

@@ -1,0 +1,42 @@
+/* ========================================
+   FAB (Floating Action Button)
+   ======================================== */
+
+.fab {
+  position: fixed;
+  right: var(--spacingL);
+  right: max(var(--spacingL), env(safe-area-inset-right, 0px));
+  bottom: var(--spacingL);
+  bottom: calc(var(--spacingL) + env(safe-area-inset-bottom, 0px));
+  z-index: 45;
+  border: none;
+  background: var(--colorBrandBackground);
+  color: #000000;
+  padding: var(--spacingM) var(--spacingL);
+  border-radius: var(--borderRadiusCircular);
+  font-weight: var(--fontWeightSemibold);
+  font-size: var(--fontSizeBase300);
+  cursor: pointer;
+  box-shadow: var(--shadow16);
+  transition: all var(--durationFast) var(--curveEasyEase);
+}
+.fab:hover {
+  background: var(--colorBrandBackgroundHover);
+  box-shadow: var(--shadow28);
+  transform: translateY(-2px);
+}
+.fab:active {
+  background: var(--colorBrandBackgroundPressed);
+  transform: translateY(0) scale(0.98);
+}
+.fab.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--colorNeutralBackground1);
+  color: var(--colorNeutralForegroundDisabled);
+  transform: none;
+  box-shadow: var(--shadow4);
+}
+@media (min-width: 900px) {
+  .fab { display: none; }
+}

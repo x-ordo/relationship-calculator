@@ -1,0 +1,29 @@
+/* ========================================
+   Layout - Grid & Row Utilities
+   ======================================== */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacingM);
+}
+@media (min-width: 640px) {
+  .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 1024px) {
+  .grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+.row {
+  display: flex;
+  gap: var(--spacingS);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.hr {
+  height: var(--strokeWidthThin);
+  background: var(--colorNeutralStroke1);
+  margin: var(--spacingM) 0;
+  border: none;
+}

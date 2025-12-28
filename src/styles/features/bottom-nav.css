@@ -1,0 +1,90 @@
+/* ========================================
+   Bottom Navigation (Mobile)
+   ======================================== */
+
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--colorNeutralBackground2);
+  border-top: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  padding: var(--spacingS);
+  padding-bottom: calc(var(--spacingS) + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.2);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacingXXS);
+  padding: var(--spacingXS) var(--spacingS);
+  background: transparent;
+  border: none;
+  border-radius: var(--borderRadiusMedium);
+  color: var(--colorNeutralForeground3);
+  cursor: pointer;
+  transition: all var(--durationFast) var(--curveEasyEase);
+  position: relative;
+}
+
+.bottom-nav-item:hover {
+  background: var(--colorSubtleBackgroundHover);
+  color: var(--colorNeutralForeground2);
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.95);
+}
+
+.bottom-nav-item.active {
+  color: var(--colorBrandForeground1);
+}
+
+.bottom-nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: calc(var(--spacingXXS) + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: var(--colorBrandBackground);
+  border-radius: var(--borderRadiusCircular);
+}
+
+.bottom-nav-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.bottom-nav-label {
+  font-size: var(--fontSizeBase100);
+  font-weight: var(--fontWeightSemibold);
+}
+
+/* Show bottom nav on mobile, hide topbar tabs */
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex;
+  }
+
+  /* Hide topbar tabs on mobile */
+  .topbar .tabs {
+    display: none;
+  }
+
+  /* Add padding at bottom for content */
+  .app {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Adjust FAB position to account for bottom nav */
+  .fab {
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  }
+}

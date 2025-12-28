@@ -1,0 +1,76 @@
+/* ========================================
+   Fluent 2 Design System - Color Tokens (Dark Theme)
+   ======================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* Color - Neutral Background */
+  --colorNeutralBackground1: #292929;
+  --colorNeutralBackground1Hover: #3d3d3d;
+  --colorNeutralBackground1Pressed: #1f1f1f;
+  --colorNeutralBackground2: #1f1f1f;
+  --colorNeutralBackground3: #141414;
+  --colorNeutralBackground4: #0a0a0a;
+  --colorNeutralBackgroundDisabled: #141414;
+
+  /* Color - Neutral Foreground */
+  --colorNeutralForeground1: #ffffff;
+  --colorNeutralForeground2: #d6d6d6;
+  --colorNeutralForeground3: #adadad;
+  --colorNeutralForeground4: #999999;
+  --colorNeutralForegroundDisabled: #5c5c5c;
+
+  /* Color - Neutral Stroke */
+  --colorNeutralStroke1: #3d3d3d;
+  --colorNeutralStroke1Hover: #525252;
+  --colorNeutralStroke1Pressed: #3d3d3d;
+  --colorNeutralStroke2: #525252;
+  --colorNeutralStrokeDisabled: #2e2e2e;
+
+  /* Color - Brand */
+  --colorBrandBackground: #2899f5;
+  --colorBrandBackgroundHover: #3aa0f3;
+  --colorBrandBackgroundPressed: #1890f1;
+  --colorBrandBackgroundSelected: #1890f1;
+  --colorBrandForeground1: #82c7ff;
+  --colorBrandForeground2: #c7e0f4;
+  --colorBrandStroke1: #2899f5;
+
+  /* Color - Subtle (for secondary buttons) */
+  --colorSubtleBackground: transparent;
+  --colorSubtleBackgroundHover: rgba(255,255,255,0.06);
+  --colorSubtleBackgroundPressed: rgba(255,255,255,0.04);
+  --colorSubtleBackgroundSelected: rgba(255,255,255,0.08);
+
+  /* Color - Status */
+  --colorStatusDangerBackground1: rgba(196,49,75,0.15);
+  --colorStatusDangerBackground2: rgba(196,49,75,0.25);
+  --colorStatusDangerForeground1: #dc626d;
+  --colorStatusDangerForeground2: #f87c7c;
+  --colorStatusSuccessBackground1: rgba(16,124,16,0.15);
+  --colorStatusSuccessBackground2: rgba(16,124,16,0.25);
+  --colorStatusSuccessForeground1: #54b054;
+  --colorStatusSuccessForeground2: #92d992;
+  --colorStatusWarningBackground1: rgba(234,179,8,0.12);
+  --colorStatusWarningForeground1: #fde68a;
+
+  /* Focus Ring */
+  --focusStrokeOuter: #ffffff;
+  --focusStrokeInner: #000000;
+
+  /* Audit Theme Colors */
+  --colorAuditRed: #CC0000;
+  --colorAuditGold: #D4AF37;
+  --colorAuditBgDeep: #050505;
+
+  /* Legacy aliases */
+  --bg: var(--colorNeutralBackground3);
+  --panel: var(--colorNeutralBackground2);
+  --border: var(--colorNeutralStroke1);
+  --text: var(--colorNeutralForeground1);
+  --muted: var(--colorNeutralForeground3);
+  --accent: var(--colorBrandBackground);
+  --danger: var(--colorStatusDangerForeground1);
+  --ok: var(--colorStatusSuccessForeground1);
+}

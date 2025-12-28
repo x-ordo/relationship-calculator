@@ -1,0 +1,28 @@
+/* ========================================
+   Layout - Topbar & Brand
+   ======================================== */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacingM);
+  padding: var(--spacingM) var(--spacingL);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  background: var(--colorNeutralBackground2);
+  border-radius: var(--borderRadiusXLarge);
+  box-shadow: var(--shadow4);
+}
+
+.brand {
+  display: flex;
+  gap: var(--spacingS);
+  align-items: center;
+}
+
+/* Tabs (Legacy - Fluent UI <TabList>/<Tab> now used) */
+.tabs {
+  display: flex;
+  gap: var(--spacingXS);
+  flex-wrap: wrap;
+}

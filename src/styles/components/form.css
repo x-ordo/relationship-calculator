@@ -1,0 +1,39 @@
+/* ========================================
+   Form Controls - Input
+   ======================================== */
+
+.input, select {
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  background: var(--colorNeutralBackground2);
+  color: var(--colorNeutralForeground1);
+  padding: var(--spacingSNudge) var(--spacingM);
+  border-radius: var(--borderRadiusMedium);
+  outline: none;
+  font-family: var(--fontFamilyBase);
+  font-size: var(--fontSizeBase300);
+  line-height: var(--lineHeightBase300);
+  min-height: 32px;
+  transition: border-color var(--durationFast) var(--curveEasyEase),
+              background var(--durationFast) var(--curveEasyEase);
+}
+.input::placeholder { color: var(--colorNeutralForeground4); }
+.input:hover, select:hover {
+  border-color: var(--colorNeutralStroke1Hover);
+}
+.input:focus, select:focus {
+  border-color: var(--colorBrandStroke1);
+  border-width: var(--strokeWidthThick);
+  padding: calc(var(--spacingSNudge) - 1px) calc(var(--spacingM) - 1px);
+}
+.input:disabled, select:disabled {
+  background: var(--colorNeutralBackgroundDisabled);
+  border-color: var(--colorNeutralStrokeDisabled);
+  color: var(--colorNeutralForegroundDisabled);
+  cursor: not-allowed;
+}
+
+.input.small {
+  width: 120px;
+  min-width: 80px;
+  flex-shrink: 1;
+}

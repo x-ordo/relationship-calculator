@@ -1,0 +1,8 @@
+/* ========================================
+   Focus Ring - Accessibility
+   ======================================== */
+
+:focus-visible {
+  outline: var(--strokeWidthThick) solid var(--focusStrokeOuter);
+  outline-offset: var(--strokeWidthThin);
+}

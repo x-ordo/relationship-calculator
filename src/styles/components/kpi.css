@@ -1,0 +1,39 @@
+/* ========================================
+   KPI / Stats
+   ======================================== */
+
+.kpi {
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  background: var(--colorNeutralBackground2);
+  border-radius: var(--borderRadiusLarge);
+  padding: var(--spacingM);
+}
+.kpi .label {
+  color: var(--colorNeutralForeground3);
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+}
+.kpi .value {
+  font-size: var(--fontSizeBase600);
+  font-weight: var(--fontWeightSemibold);
+  line-height: var(--lineHeightBase600);
+  margin-top: var(--spacingXXS);
+}
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacingS); }
+.stat {
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  background: var(--colorNeutralBackground2);
+  border-radius: var(--borderRadiusLarge);
+  padding: var(--spacingM);
+}
+
+.big {
+  font-size: var(--fontSizeBase600);
+  font-weight: var(--fontWeightSemibold);
+  line-height: var(--lineHeightBase600);
+  letter-spacing: -0.02em;
+}
+.big.danger { color: var(--colorStatusDangerForeground1); }
+.danger { color: var(--colorStatusDangerForeground1); }
+.ok { color: var(--colorStatusSuccessForeground1); }

@@ -1,0 +1,30 @@
+/* ========================================
+   Panel / Card Components
+   ======================================== */
+
+.panel {
+  margin-top: var(--spacingM);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  background: var(--colorNeutralBackground3);
+  border-radius: var(--borderRadiusXLarge);
+  padding: var(--spacingL);
+  box-shadow: var(--shadow4);
+}
+
+.card {
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  background: var(--colorNeutralBackground2);
+  border-radius: var(--borderRadiusLarge);
+  padding: var(--spacingM);
+  transition: box-shadow var(--durationFast) var(--curveEasyEase);
+}
+.card:hover {
+  box-shadow: var(--shadow8);
+}
+
+.cardPreviewWrap {
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  border-radius: var(--borderRadiusXLarge);
+  overflow: hidden;
+  background: var(--colorNeutralBackground2);
+}

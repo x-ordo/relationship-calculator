@@ -1,0 +1,59 @@
+/* ========================================
+   Onboarding
+   ======================================== */
+
+.obModal { width: min(940px, 94vw); }
+.obDots { display: flex; gap: var(--spacingS); margin-top: var(--spacingS); }
+.obDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--borderRadiusCircular);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
+  background: transparent;
+  transition: all var(--durationFast) var(--curveEasyEase);
+}
+.obDot.on {
+  background: var(--colorBrandBackground);
+  border-color: var(--colorBrandBackground);
+  transform: scale(1.2);
+}
+
+.obList {
+  margin: var(--spacingS) 0 0;
+  padding-left: var(--spacingL);
+  color: var(--colorNeutralForeground1);
+}
+.obList li { margin: var(--spacingS) 0; }
+
+.obPeople { display: flex; flex-wrap: wrap; gap: var(--spacingS); margin-top: var(--spacingS); }
+.obChip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacingXS) var(--spacingS);
+  border-radius: var(--borderRadiusCircular);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  background: var(--colorNeutralBackground2);
+  font-size: var(--fontSizeBase200);
+  font-weight: var(--fontWeightSemibold);
+  transition: all var(--durationFast) var(--curveEasyEase);
+}
+.obChip:hover {
+  background: var(--colorNeutralBackground1);
+}
+
+.obPreview {
+  margin-top: var(--spacingS);
+  border-radius: var(--borderRadiusLarge);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  background: var(--colorNeutralBackground2);
+  padding: var(--spacingM);
+}
+.obPreviewTop { display: flex; justify-content: space-between; align-items: center; gap: var(--spacingS); }
+.obBig { font-size: var(--fontSizeHero800); font-weight: var(--fontWeightSemibold); letter-spacing: -0.02em; margin-top: var(--spacingM); }
+.obKpis { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacingS); margin-top: var(--spacingM); }
+.obKpi {
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  background: var(--colorNeutralBackground2);
+  border-radius: var(--borderRadiusLarge);
+  padding: var(--spacingS);
+}

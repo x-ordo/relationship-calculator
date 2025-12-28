@@ -1,0 +1,16 @@
+/* ========================================
+   Animations
+   ======================================== */
+
+@keyframes rr-pop {
+  0%   { transform: scale(0.96); }
+  50%  { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+.rr-pop {
+  animation: rr-pop var(--durationFast) var(--curveDecelerateMax);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

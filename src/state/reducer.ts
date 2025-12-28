@@ -159,7 +159,7 @@ case 'PERSON_ADD': {
         ...s,
         domain: {
           ...s.domain,
-          plan: 'paid',
+          plan: e.plan,
           entitlement: { token: e.token, expiresAt: e.expiresAt },
         },
         proUi: { ...s.proUi, payment: success({ token: e.token, expiresAt: e.expiresAt }), paymentPhase: 'idle' },

@@ -1,4 +1,4 @@
-export type Plan = 'free' | 'paid'
+export type Plan = 'free' | 'plus' | 'pro'
 
 export type PersonCategory = 'personal' | 'work' | 'family'
 

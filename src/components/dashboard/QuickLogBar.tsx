@@ -1,5 +1,5 @@
-/** @jsxImportSource preact */
-import { useEffect, useMemo, useState } from 'preact/hooks'
+import { useEffect, useMemo, useState } from 'react'
+import { Button, Dialog, DialogSurface, DialogBody, Badge } from '@fluentui/react-components'
 import type { AppState as DomainState, Entry } from '../../shared/storage/state'
 import type { AppEvent } from '../../state/events'
 import { uid } from '../../shared/storage/state'
@@ -141,40 +141,40 @@ export function QuickLogBar({ domain, dispatch, personId, setPersonId, onSaved, 
   }
 
   return (
-    <div class={`quickbar ${compact ? 'compact' : ''}`} style={{ marginTop: compact ? 0 : 12 }}>
-      <div class="row" style={{ justifyContent: 'space-between', gap: 12 }}>
+    <div className={`quickbar ${compact ? 'compact' : ''}`} style={{ marginTop: compact ? 0 : 12 }}>
+      <div className="row" style={{ justifyContent: 'space-between', gap: 12 }}>
         <div>
-          <div class="h2">오늘 10초 기록</div>
-          <div class="hint">길게 쓰지 마. 숫자만 찍고 끝. (오늘 날짜로 저장)</div>
+          <div className="h2">오늘 10초 기록</div>
+          <div className="hint">길게 쓰지 마. 숫자만 찍고 끝. (오늘 날짜로 저장)</div>
         </div>
-        <div class="row">
-          {saved && <div class="badge" style={{ borderColor: 'rgba(52,211,153,0.35)', color: 'var(--ok)' }}>저장됨</div>}
-          {error && <div class="badge" style={{ borderColor: 'rgba(239,68,68,0.35)', color: 'var(--colorStatusDangerForeground1)' }}>오류</div>}
-          <button class="btn primary" onClick={save} disabled={!canSave}>저장</button>
+        <div className="row">
+          {saved && <Badge appearance="outline" color="success">저장됨</Badge>}
+          {error && <Badge appearance="outline" color="danger">오류</Badge>}
+          <Button appearance="primary" onClick={save} disabled={!canSave}>저장</Button>
         </div>
       </div>
 
       {error && (
-        <div class="callout danger" style={{ marginTop: 8, padding: '8px 12px' }}>
+        <div className="callout danger" style={{ marginTop: 8, padding: '8px 12px' }}>
           {error}
         </div>
       )}
 
       {!hasPeople ? (
-        <div class="callout danger" style={{ marginTop: 10 }}>
+        <div className="callout danger" style={{ marginTop: 10 }}>
           <div style={{ fontWeight: 900 }}>사람이 없으면 기록도 없다.</div>
-          <div class="hint">위에서 사람부터 추가해.</div>
+          <div className="hint">위에서 사람부터 추가해.</div>
         </div>
       ) : (
         <>
           {/* 프리셋 템플릿 */}
-          <div class="qGroup" style={{ marginTop: 10 }}>
-            <div class="qLabel">빠른 선택</div>
-            <div class="qButtons" style={{ flexWrap: 'wrap' }}>
+          <div className="qGroup" style={{ marginTop: 10 }}>
+            <div className="qLabel">빠른 선택</div>
+            <div className="qButtons" style={{ flexWrap: 'wrap' }}>
               {PRESETS.map(p => (
                 <button
                   key={p.id}
-                  class={`qBtn ${activePreset === p.id ? 'on' : ''}`}
+                  className={`qBtn ${activePreset === p.id ? 'on' : ''}`}
                   onClick={() => applyPreset(p)}
                   title={p.label}
                 >
@@ -184,52 +184,52 @@ export function QuickLogBar({ domain, dispatch, personId, setPersonId, onSaved, 
             </div>
           </div>
 
-          <div class="row" style={{ marginTop: 10 }}>
-            <div class="qGroup">
-              <div class="qLabel">대상 {isClient && <span class="pillMini" style={{ marginLeft: 4 }}>업무</span>}</div>
-              <select value={personId} onChange={(e) => setPersonId((e.currentTarget as HTMLSelectElement).value)}>
+          <div className="row" style={{ marginTop: 10 }}>
+            <div className="qGroup">
+              <div className="qLabel">대상 {isClient && <span className="pillMini" style={{ marginLeft: 4 }}>업무</span>}</div>
+              <select value={personId} onChange={(e) => setPersonId(e.currentTarget.value)}>
                 <option value="">사람 선택</option>
-                {people.map(p => <option value={p.id}>{p.name}{p.isClient ? ' (클라이언트)' : ''}</option>)}
+                {people.map(p => <option key={p.id} value={p.id}>{p.name}{p.isClient ? ' (클라이언트)' : ''}</option>)}
               </select>
             </div>
 
-            <div class="qGroup">
-              <div class="qLabel">시간 (인건비)</div>
-              <div class="qButtons">
+            <div className="qGroup">
+              <div className="qLabel">시간 (인건비)</div>
+              <div className="qButtons">
                 {minutePresets.map(m => (
-                  <button class={`qBtn ${minutes === m ? 'on' : ''}`} onClick={() => setMinutes(m)}>{m}분</button>
+                  <button key={m} className={`qBtn ${minutes === m ? 'on' : ''}`} onClick={() => setMinutes(m)}>{m}분</button>
                 ))}
                 <input
-                  class="input qInput"
+                  className="input qInput"
                   type="number"
                   min={0}
                   max={1440}
                   value={minutes}
-                  onInput={(e) => {
-                    const val = Number((e.currentTarget as HTMLInputElement).value)
+                  onChange={(e) => {
+                    const val = Number(e.currentTarget.value)
                     setMinutes(Math.max(0, Math.min(1440, val || 0)))
                   }}
                 />
               </div>
-              <div class="hint danger" style={{ marginTop: 4 }}>
+              <div className="hint danger" style={{ marginTop: 4 }}>
                 = -₩{timeCostWon.toLocaleString()} 환산
               </div>
             </div>
 
-            <div class="qGroup">
-              <div class="qLabel">돈 (직접 비용)</div>
-              <div class="qButtons">
+            <div className="qGroup">
+              <div className="qLabel">돈 (직접 비용)</div>
+              <div className="qButtons">
                 {moneyPresets.map(w => (
-                  <button class={`qBtn ${moneyWon === w ? 'on' : ''}`} onClick={() => setMoneyWon(w)}>{w === 0 ? '0' : `₩${(w/1000).toFixed(0)}k`}</button>
+                  <button key={w} className={`qBtn ${moneyWon === w ? 'on' : ''}`} onClick={() => setMoneyWon(w)}>{w === 0 ? '0' : `₩${(w/1000).toFixed(0)}k`}</button>
                 ))}
                 <input
-                  class="input qInput"
+                  className="input qInput"
                   type="number"
                   min={0}
                   max={100000000}
                   value={moneyWon}
-                  onInput={(e) => {
-                    const val = Number((e.currentTarget as HTMLInputElement).value)
+                  onChange={(e) => {
+                    const val = Number(e.currentTarget.value)
                     setMoneyWon(Math.max(0, Math.min(100000000, val || 0)))
                   }}
                 />
@@ -237,67 +237,69 @@ export function QuickLogBar({ domain, dispatch, personId, setPersonId, onSaved, 
             </div>
           </div>
 
-          <div class="row" style={{ marginTop: 10, alignItems: 'flex-start' }}>
-            <div class="qGroup">
-              <div class="qLabel">감정세 (VAT)</div>
-              <div class="qButtons">
+          <div className="row" style={{ marginTop: 10, alignItems: 'flex-start' }}>
+            <div className="qGroup">
+              <div className="qLabel">감정세 (VAT)</div>
+              <div className="qButtons">
                 {([-2, -1, 0, 1, 2] as const).map(v => (
-                  <button class={`qBtn ${moodDelta === v ? 'on' : ''}`} onClick={() => setMoodDelta(v)}>{v === 0 ? '0' : v > 0 ? `+${v}` : `${v}`}</button>
+                  <button key={v} className={`qBtn ${moodDelta === v ? 'on' : ''}`} onClick={() => setMoodDelta(v)}>{v === 0 ? '0' : v > 0 ? `+${v}` : `${v}`}</button>
                 ))}
               </div>
-              <div class="hint" style={{ marginTop: 6 }}>-2 멘탈 박살 … +2 에너지 회복</div>
+              <div className="hint" style={{ marginTop: 6 }}>-2 멘탈 박살 … +2 에너지 회복</div>
             </div>
 
-            <div class="qGroup">
-              <div class="qLabel">투자 효율</div>
-              <div class="qButtons">
+            <div className="qGroup">
+              <div className="qLabel">투자 효율</div>
+              <div className="qButtons">
                 {([1, 2, 3, 4, 5] as const).map(v => (
-                  <button class={`qBtn ${reciprocity === v ? 'on' : ''}`} onClick={() => setReciprocity(v)}>{v}</button>
+                  <button key={v} className={`qBtn ${reciprocity === v ? 'on' : ''}`} onClick={() => setReciprocity(v)}>{v}</button>
                 ))}
               </div>
-              <div class="hint" style={{ marginTop: 6 }}>1 손해만 … 5 상호 이득</div>
+              <div className="hint" style={{ marginTop: 6 }}>1 손해만 … 5 상호 이득</div>
             </div>
 
-            <div class="qGroup">
-              <div class="qLabel">추가 비용</div>
-              <div class="qButtons">
-                <button class={`qBtn ${boundaryHit ? 'on danger' : ''}`} onClick={() => setBoundaryHit(!boundaryHit)}>
+            <div className="qGroup">
+              <div className="qLabel">추가 비용</div>
+              <div className="qButtons">
+                <button className={`qBtn ${boundaryHit ? 'on danger' : ''}`} onClick={() => setBoundaryHit(!boundaryHit)}>
                   {boundaryHit ? '선 넘음' : '정상'}
                 </button>
               </div>
-              <div class="hint" style={{ marginTop: 6 }}>경계 침범 = 추가 손실</div>
+              <div className="hint" style={{ marginTop: 6 }}>경계 침범 = 추가 손실</div>
             </div>
           </div>
         </>
       )}
 
       {/* 확인 모달 */}
-      {confirmOpen && pendingEntry && (
-        <div class="sheetOverlay" onClick={(e) => { if (e.target === e.currentTarget) cancelSave() }}>
-          <div class="sheet" style={{ maxWidth: 400 }}>
-            <div class="h2" style={{ margin: 0 }}>기록 확인</div>
-            <div class="hint" style={{ marginTop: 4 }}>아래 내용으로 저장할까요?</div>
+      <Dialog open={confirmOpen && !!pendingEntry} onOpenChange={(_, data) => !data.open && cancelSave()}>
+        <DialogSurface className="sheet" style={{ maxWidth: 400 }}>
+          <DialogBody>
+            <div className="h2" style={{ margin: 0 }}>기록 확인</div>
+            <div className="hint" style={{ marginTop: 4 }}>아래 내용으로 저장할까요?</div>
 
-            <div class="card" style={{ marginTop: 12, background: 'var(--colorNeutralBackground3)' }}>
-              <div style={{ fontWeight: 700 }}>{people.find(p => p.id === pendingEntry.personId)?.name || '(unknown)'}</div>
-              <div class="hint" style={{ marginTop: 6 }}>
-                {pendingEntry.minutes}분 · ₩{pendingEntry.moneyWon.toLocaleString()} ·
-                기분 {pendingEntry.moodDelta > 0 ? '+' : ''}{pendingEntry.moodDelta} ·
-                상호성 {pendingEntry.reciprocity}
-                {pendingEntry.boundaryHit && <span class="pillMini danger" style={{ marginLeft: 6 }}>경계 침해</span>}
+            {pendingEntry && (
+              <div className="card" style={{ marginTop: 12, background: 'var(--colorNeutralBackground3)' }}>
+                <div style={{ fontWeight: 700 }}>{people.find(p => p.id === pendingEntry.personId)?.name || '(unknown)'}</div>
+                <div className="hint" style={{ marginTop: 6 }}>
+                  {pendingEntry.minutes}분 · ₩{pendingEntry.moneyWon.toLocaleString()} ·
+                  기분 {pendingEntry.moodDelta > 0 ? '+' : ''}{pendingEntry.moodDelta} ·
+                  상호성 {pendingEntry.reciprocity}
+                  {pendingEntry.boundaryHit && <span className="pillMini danger" style={{ marginLeft: 6 }}>경계 침해</span>}
+                </div>
+                <div className="hint danger" style={{ marginTop: 4 }}>
+                  시간 비용: -₩{Math.round((pendingEntry.minutes / 60) * hourlyRate).toLocaleString()}
+                </div>
               </div>
-              <div class="hint danger" style={{ marginTop: 4 }}>
-                시간 비용: -₩{Math.round((pendingEntry.minutes / 60) * hourlyRate).toLocaleString()}
-              </div>
-            </div>
+            )}
 
-            <div class="row" style={{ marginTop: 14, justifyContent: 'flex-end', gap: 8 }}>
-              <button class="btn" onClick={cancelSave}>취소</button>
-              <button class="btn primary" onClick={confirmSave}>저장</button>
+            <div className="row" style={{ marginTop: 14, justifyContent: 'flex-end', gap: 8 }}>
+              <Button onClick={cancelSave}>취소</Button>
+              <Button appearance="primary" onClick={confirmSave}>저장</Button>
             </div>
-          </div>
-        </div>
-      )}
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
     </div>
   )
 }

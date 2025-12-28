@@ -1,5 +1,5 @@
-/** @jsxImportSource preact */
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Button, Card, Badge, Dialog, DialogSurface, DialogBody } from '@fluentui/react-components'
 import type { AppState as DomainState } from '../../shared/storage/state'
 import type { AppEvent } from '../../state/events'
 import { buildReport, calcReceiptLines } from '../../shared/domain/report'
@@ -149,115 +149,115 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
   }
 
   return (
-    <div class="panel">
-      <div class="row" style={{ justifyContent: 'space-between' }}>
+    <div className="panel">
+      <div className="row" style={{ justifyContent: 'space-between' }}>
         <div>
-          <div class="h1">공유</div>
-          <div class="hint">인스타 스토리 1080×1920. 익명화 + PII 스캔 + 체크리스트로 사고 방지.</div>
+          <div className="h1">공유</div>
+          <div className="hint">인스타 스토리 1080×1920. 익명화 + PII 스캔 + 체크리스트로 사고 방지.</div>
         </div>
-        <div class="row">
-          <div class="badge">{domain.plan === 'paid' ? 'PRO' : 'FREE'}</div>
+        <div className="row">
+          <Badge>{domain.plan === 'paid' ? 'PRO' : 'FREE'}</Badge>
         </div>
       </div>
 
-{introOpen && (
-  <div class="modalOverlay">
-    <div class="modal">
-      <div class="h2">첫 방문 안전 안내</div>
-      <div class="hint">공유는 “한 번” 삐끗하면 끝. 여기서 기준을 박고 간다.</div>
+      <Dialog open={introOpen} onOpenChange={(_, data) => !data.open && setIntroOpen(false)}>
+        <DialogSurface className="modal">
+          <DialogBody>
+            <div className="h2">첫 방문 안전 안내</div>
+            <div className="hint">공유는 "한 번" 삐끗하면 끝. 여기서 기준을 박고 간다.</div>
 
-      <div class="callout danger" style={{ marginTop: 12 }}>
-        <div style={{ fontWeight: 950 }}>필수 룰</div>
-        <ul style={{ marginTop: 8, paddingLeft: 18 }}>
-          <li class="hint">실명/회사명/학교/연락처/카톡ID/계좌 같은 식별정보는 절대 올리지 마.</li>
-          <li class="hint">‘상대 익명화(A/B/C)’는 기본 ON 추천.</li>
-          <li class="hint">저장 버튼 누르면 체크리스트를 강제로 통과해야 저장됨.</li>
-        </ul>
-      </div>
+            <div className="callout danger" style={{ marginTop: 12 }}>
+              <div style={{ fontWeight: 950 }}>필수 룰</div>
+              <ul style={{ marginTop: 8, paddingLeft: 18 }}>
+                <li className="hint">실명/회사명/학교/연락처/카톡ID/계좌 같은 식별정보는 절대 올리지 마.</li>
+                <li className="hint">'상대 익명화(A/B/C)'는 기본 ON 추천.</li>
+                <li className="hint">저장 버튼 누르면 체크리스트를 강제로 통과해야 저장됨.</li>
+              </ul>
+            </div>
 
-      <div class="h2" style={{ marginTop: 14 }}>체크리스트(예시)</div>
-      <div class="hint">아래 “필수”는 저장할 때도 다시 체크한다.</div>
-      <div style={{ marginTop: 10 }}>
-        {SHARE_CHECKLIST.slice(0, 6).map(item => (
-          <div class="row" style={{ gap: 10, marginBottom: 8 }}>
-            <div class={`pill ${item.must ? 'danger' : ''}`}>{item.must ? '필수' : '권장'}</div>
-            <div style={{ fontWeight: item.must ? 950 : 700 }}>{item.label}</div>
-          </div>
-        ))}
-      </div>
+            <div className="h2" style={{ marginTop: 14 }}>체크리스트(예시)</div>
+            <div className="hint">아래 "필수"는 저장할 때도 다시 체크한다.</div>
+            <div style={{ marginTop: 10 }}>
+              {SHARE_CHECKLIST.slice(0, 6).map(item => (
+                <div key={item.id} className="row" style={{ gap: 10, marginBottom: 8 }}>
+                  <div className={`pill ${item.must ? 'danger' : ''}`}>{item.must ? '필수' : '권장'}</div>
+                  <div style={{ fontWeight: item.must ? 950 : 700 }}>{item.label}</div>
+                </div>
+              ))}
+            </div>
 
-      <div class="row" style={{ justifyContent: 'flex-end', marginTop: 14 }}>
-        <button
-          class="btn primary"
-          onClick={() => {
-            setIntroOpen(false)
-            dispatch({ type: 'SETTINGS_PATCH', patch: { shareSafetyIntroSeen: true } })
-          }}
-        >
-          확인했음
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+            <div className="row" style={{ justifyContent: 'flex-end', marginTop: 14 }}>
+              <Button
+                appearance="primary"
+                onClick={() => {
+                  setIntroOpen(false)
+                  dispatch({ type: 'SETTINGS_PATCH', patch: { shareSafetyIntroSeen: true } })
+                }}
+              >
+                확인했음
+              </Button>
+            </div>
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
 
 
-      <div class="grid cols-2" style={{ marginTop: 14 }}>
-        <div class="card">
-          <div class="h2">설정</div>
+      <div className="grid cols-2" style={{ marginTop: 14 }}>
+        <Card className="card">
+          <div className="h2">설정</div>
 
-          <div class="h3" style={{ marginTop: 10 }}>레이아웃</div>
-          <div class="row" style={{ marginTop: 6, gap: 6, flexWrap: 'wrap' }}>
-            <button class={`tab ${layoutCategoryFilter === 'ALL' ? 'active' : ''}`} onClick={() => setLayoutCategoryFilter('ALL')}>전체</button>
+          <div className="h3" style={{ marginTop: 10 }}>레이아웃</div>
+          <div className="row" style={{ marginTop: 6, gap: 6, flexWrap: 'wrap' }}>
+            <button className={`tab ${layoutCategoryFilter === 'ALL' ? 'active' : ''}`} onClick={() => setLayoutCategoryFilter('ALL')}>전체</button>
             {LAYOUT_CATEGORIES.map(c => (
-              <button class={`tab ${layoutCategoryFilter === c.value ? 'active' : ''}`} onClick={() => setLayoutCategoryFilter(c.value)}>{c.label}</button>
+              <button key={c.value} className={`tab ${layoutCategoryFilter === c.value ? 'active' : ''}`} onClick={() => setLayoutCategoryFilter(c.value)}>{c.label}</button>
             ))}
-            <span class="badge">레이아웃 {filteredLayoutList.length}/{SHARE_CARD_LAYOUTS.length}</span>
+            <Badge>레이아웃 {filteredLayoutList.length}/{SHARE_CARD_LAYOUTS.length}</Badge>
           </div>
 
-          <div class="h3" style={{ marginTop: 10 }}>카피 톤</div>
-          <div class="row" style={{ marginTop: 6, gap: 6, flexWrap: 'wrap' }}>
-            <button class={`tab ${toneFilter === 'ALL' ? 'active' : ''}`} onClick={() => setToneFilter('ALL')}>전체</button>
-            <button class={`tab ${toneFilter === '냉정' ? 'active' : ''}`} onClick={() => setToneFilter('냉정')}>냉정</button>
-            <button class={`tab ${toneFilter === '회복' ? 'active' : ''}`} onClick={() => setToneFilter('회복')}>회복</button>
-            <button class={`tab ${toneFilter === '유머' ? 'active' : ''}`} onClick={() => setToneFilter('유머')}>유머</button>
-            <span class="badge">카피 {filteredCopyList.length}/{SHARE_CARD_COPY.length}</span>
+          <div className="h3" style={{ marginTop: 10 }}>카피 톤</div>
+          <div className="row" style={{ marginTop: 6, gap: 6, flexWrap: 'wrap' }}>
+            <button className={`tab ${toneFilter === 'ALL' ? 'active' : ''}`} onClick={() => setToneFilter('ALL')}>전체</button>
+            <button className={`tab ${toneFilter === '냉정' ? 'active' : ''}`} onClick={() => setToneFilter('냉정')}>냉정</button>
+            <button className={`tab ${toneFilter === '회복' ? 'active' : ''}`} onClick={() => setToneFilter('회복')}>회복</button>
+            <button className={`tab ${toneFilter === '유머' ? 'active' : ''}`} onClick={() => setToneFilter('유머')}>유머</button>
+            <Badge>카피 {filteredCopyList.length}/{SHARE_CARD_COPY.length}</Badge>
           </div>
 
-          <div class="row" style={{ marginTop: 10, flexWrap: 'wrap', gap: 8 }}>
-            <label class="pill">
+          <div className="row" style={{ marginTop: 10, flexWrap: 'wrap', gap: 8 }}>
+            <label className="pill">
               레이아웃
-              <select value={layoutId} onChange={(e) => setLayoutId((e.currentTarget as HTMLSelectElement).value as LayoutId)}>
-                {filteredLayoutList.map(l => <option value={l.id}>{l.category} · {l.name}</option>)}
+              <select value={layoutId} onChange={(e) => setLayoutId(e.currentTarget.value as LayoutId)}>
+                {filteredLayoutList.map(l => <option key={l.id} value={l.id}>{l.category} · {l.name}</option>)}
               </select>
             </label>
 
-            <label class="pill">
+            <label className="pill">
               카피
-              <select value={copyId} onChange={(e) => setCopyId((e.currentTarget as HTMLSelectElement).value)}>
+              <select value={copyId} onChange={(e) => setCopyId(e.currentTarget.value)}>
                 {filteredCopyList.map(c => {
                   const clean = c.headline.replace(/\{\{[^}]+\}\}/g, '').replace(/\s+/g, ' ').trim()
-                  return <option value={c.id}>{c.tone} · {clean.slice(0, 22) || c.id}</option>
+                  return <option key={c.id} value={c.id}>{c.tone} · {clean.slice(0, 22) || c.id}</option>
                 })}
               </select>
             </label>
           </div>
 
-          <div class="row" style={{ marginTop: 8, gap: 8 }}>
-            <button class="btn" onClick={() => randomizeLayout()}>랜덤 레이아웃</button>
-            <button class="btn" onClick={() => randomizeCopy()}>랜덤 카피</button>
-            <button class="btn" onClick={randomizeAll}>랜덤 전체</button>
+          <div className="row" style={{ marginTop: 8, gap: 8 }}>
+            <Button onClick={() => randomizeLayout()}>랜덤 레이아웃</Button>
+            <Button onClick={() => randomizeCopy()}>랜덤 카피</Button>
+            <Button onClick={randomizeAll}>랜덤 전체</Button>
           </div>
 
-          <div class="row" style={{ marginTop: 10 }}>
-            <label class="row" style={{ gap: 8 }}>
+          <div className="row" style={{ marginTop: 10 }}>
+            <label className="row" style={{ gap: 8 }}>
               <input
                 type="checkbox"
                 checked={domain.settings.anonymizeOnShare}
                 onChange={(e) =>
                   dispatch({
                     type: 'SETTINGS_PATCH',
-                    patch: { anonymizeOnShare: (e.currentTarget as HTMLInputElement).checked },
+                    patch: { anonymizeOnShare: e.currentTarget.checked },
                   })
                 }
               />
@@ -265,44 +265,44 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
             </label>
           </div>
 
-          <div class={`callout ${safety.level === 'DANGER' ? 'danger' : safety.level === 'WARN' ? '' : 'ok'}`} style={{ marginTop: 12 }}>
+          <div className={`callout ${safety.level === 'DANGER' ? 'danger' : safety.level === 'WARN' ? '' : 'ok'}`} style={{ marginTop: 12 }}>
             <div style={{ fontWeight: 900 }}>공유 위험도: {safety.level} (score {safety.score})</div>
-            <div class="hint">{safety.summary}</div>
+            <div className="hint">{safety.summary}</div>
             {safety.findings.length > 0 && (
               <ul style={{ marginTop: 8, paddingLeft: 18 }}>
-                {safety.findings.slice(0, 5).map(f => <li class="hint">{formatFinding(f)}</li>)}
+                {safety.findings.slice(0, 5).map((f, i) => <li key={i} className="hint">{formatFinding(f)}</li>)}
               </ul>
             )}
           </div>
 
-          <div class="h2" style={{ marginTop: 14 }}>공유 문구</div>
-          <div class="note" style={{ whiteSpace: 'pre-wrap' }}>{
+          <div className="h2" style={{ marginTop: 14 }}>공유 문구</div>
+          <div className="note" style={{ whiteSpace: 'pre-wrap' }}>{
             domain.settings.anonymizeOnShare
               ? anonymizeText(`${headline}\n${sub}\n— ${footer}`, aliasMap)
               : `${headline}\n${sub}\n— ${footer}`
           }</div>
 
-          <div class="row" style={{ marginTop: 10 }}>
-            <button class="btn" onClick={() => navigator.clipboard.writeText(domain.settings.anonymizeOnShare ? anonymizeText(`${headline}\n${sub}\n— ${footer}`, aliasMap) : `${headline}\n${sub}\n— ${footer}`)}>
+          <div className="row" style={{ marginTop: 10 }}>
+            <Button onClick={() => navigator.clipboard.writeText(domain.settings.anonymizeOnShare ? anonymizeText(`${headline}\n${sub}\n— ${footer}`, aliasMap) : `${headline}\n${sub}\n— ${footer}`)}>
               문구 복사
-            </button>
-            <button class="btn primary" onClick={() => onExport('download')}>스토리 PNG 저장</button>
-            <button class="btn" onClick={() => onExport('share')}>바로 공유(모바일)</button>
+            </Button>
+            <Button appearance="primary" onClick={() => onExport('download')}>스토리 PNG 저장</Button>
+            <Button onClick={() => onExport('share')}>바로 공유(모바일)</Button>
           </div>
 
-          <div class="hint" style={{ marginTop: 10 }}>
-            “손해”를 공유하면 공감은 빨리 오지만, 식별정보 섞이면 지옥문 열린다. 체크리스트는 강제로.
+          <div className="hint" style={{ marginTop: 10 }}>
+            "손해"를 공유하면 공감은 빨리 오지만, 식별정보 섞이면 지옥문 열린다. 체크리스트는 강제로.
           </div>
-        </div>
+        </Card>
 
-        <div class="card">
-          <div class="h2">미리보기 (1080×1920)</div>
-          <div class="hint">브라우저 화면이 작아도 저장 PNG는 2배 해상도로 뽑힘.</div>
+        <Card className="card">
+          <div className="h2">미리보기 (1080×1920)</div>
+          <div className="hint">브라우저 화면이 작아도 저장 PNG는 2배 해상도로 뽑힘.</div>
 
           <div style={{ marginTop: 12, display: 'flex', justifyContent: 'center' }}>
             <div
               key={animKey}
-              class="rr-pop"
+              className="rr-pop"
               ref={cardRef}
               style={{
                 width: 360,
@@ -321,7 +321,7 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
               )}
 
               <div style={{ padding: 22, position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <div class="row" style={{ justifyContent: 'space-between' }}>
+                <div className="row" style={{ justifyContent: 'space-between' }}>
                   <div style={{ fontWeight: 900, letterSpacing: '-0.3px' }}>Relationship ROI</div>
                   <div style={{ fontSize: 12, color: layout.sub }}>{domain.plan === 'paid' ? 'PRO' : 'FREE'} · {report.windowLabel}</div>
                 </div>
@@ -368,7 +368,7 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
                   <div style={{ marginTop: 18, padding: 14, borderRadius: 18, border: `1px solid ${layout.border}`, background: 'rgba(255,255,255,0.04)' }}>
                     <div style={{ fontSize: 12, color: layout.sub }}>총 손실</div>
                     <div style={{ fontSize: 34, fontWeight: 950, color: layout.brutal ? layout.accent : 'var(--danger)' }}>-₩{report.totals.netLossWon.toLocaleString()}</div>
-                    <div class="row" style={{ justifyContent: 'space-between', marginTop: 8 }}>
+                    <div className="row" style={{ justifyContent: 'space-between', marginTop: 8 }}>
                       <div style={{ fontSize: 12, color: layout.sub }}>원인 1위</div>
                       <div style={{ fontSize: 12, fontWeight: 900, color: layout.accent }}>{report.topCauseLabel}</div>
                     </div>
@@ -407,45 +407,45 @@ const [toneFilter, setToneFilter] = useState<'ALL' | '냉정' | '회복' | '유�
             </div>
           </div>
 
-          <div class="hint" style={{ marginTop: 12 }}>
+          <div className="hint" style={{ marginTop: 12 }}>
             저장 PNG는 실제로 1080×1920 비율로 export됨. (미리보기는 축소)
           </div>
-        </div>
+        </Card>
       </div>
 
-      {confirmOpen && (
-        <div class="modalOverlay">
-          <div class="modal">
-            <div class="h2">공유 전 마지막 확인</div>
-            <div class="hint">여기서 실수하면, 너만 손해 본다.</div>
+      <Dialog open={confirmOpen} onOpenChange={(_, data) => !data.open && setConfirmOpen(false)}>
+        <DialogSurface className="modal">
+          <DialogBody>
+            <div className="h2">공유 전 마지막 확인</div>
+            <div className="hint">여기서 실수하면, 너만 손해 본다.</div>
 
-            <div class="callout" style={{ marginTop: 10 }}>
+            <div className="callout" style={{ marginTop: 10 }}>
               <div style={{ fontWeight: 900 }}>PII 스캔 결과: {safety.level} (score {safety.score})</div>
               {safety.findings.length > 0 && (
                 <ul style={{ marginTop: 8, paddingLeft: 18 }}>
-                  {safety.findings.slice(0, 8).map(f => <li class="hint">{formatFinding(f)}</li>)}
+                  {safety.findings.slice(0, 8).map((f, i) => <li key={i} className="hint">{formatFinding(f)}</li>)}
                 </ul>
               )}
             </div>
 
             <div style={{ marginTop: 14 }}>
               {SHARE_CHECKLIST.map(item => (
-                <label class="row" style={{ gap: 10, marginBottom: 8 }}>
-                  <input type="checkbox" checked={checked[item.id]} onChange={(e) => setChecked({ ...checked, [item.id]: (e.currentTarget as HTMLInputElement).checked })} />
+                <label key={item.id} className="row" style={{ gap: 10, marginBottom: 8 }}>
+                  <input type="checkbox" checked={checked[item.id]} onChange={(e) => setChecked({ ...checked, [item.id]: e.currentTarget.checked })} />
                   <span style={{ fontWeight: item.must ? 950 : 700 }}>{item.label}{item.must ? ' (필수)' : ''}</span>
                 </label>
               ))}
             </div>
 
-            <div class="row" style={{ justifyContent: 'flex-end', marginTop: 14 }}>
-              <button class="btn" onClick={() => setConfirmOpen(false)}>취소</button>
-              <button class="btn primary" disabled={!canProceed} onClick={doExport}>저장 진행</button>
+            <div className="row" style={{ justifyContent: 'flex-end', marginTop: 14 }}>
+              <Button onClick={() => setConfirmOpen(false)}>취소</Button>
+              <Button appearance="primary" disabled={!canProceed} onClick={doExport}>저장 진행</Button>
             </div>
 
-            {!canProceed && <div class="hint" style={{ marginTop: 10 }}>필수 항목 체크해야 저장 가능.</div>}
-          </div>
-        </div>
-      )}
+            {!canProceed && <div className="hint" style={{ marginTop: 10 }}>필수 항목 체크해야 저장 가능.</div>}
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
     </div>
   )
 }

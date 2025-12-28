@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'preact/hooks'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 // Web Speech API types (not fully standardized)
 interface SpeechRecognitionEvent extends Event {

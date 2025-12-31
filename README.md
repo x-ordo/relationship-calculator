@@ -10,7 +10,7 @@ pnpm i
 pnpm dev
 ```
 
-## 포함된 기능 (MVP v0.5.8)
+## 포함된 기능 (MVP v0.7.0)
 
 - 사람 추가/삭제
 - 관계 이벤트 기록 (분/원/기분변화/상호성/경계침해/메모)
@@ -40,7 +40,7 @@ pnpm dev
 
 ## License
 
-Copyright (c) 2025 Prometheus-P. All Rights Reserved.
+Copyright (c) 2025 x-ordo. All Rights Reserved.
 
 This is proprietary software. Unauthorized copying, modification, or distribution is strictly prohibited.
 
